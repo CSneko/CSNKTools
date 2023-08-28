@@ -22,9 +22,7 @@ public class loginmsg implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         String joinText = joinMessage;
 
-        /*
-         * 使用"setPlaceholders"解析占位符。
-         */
+         // 使用"setPlaceholders"解析占位符。
         joinText = PlaceholderAPI.setPlaceholders(event.getPlayer(), joinText);
 
         event.setJoinMessage(joinText);
