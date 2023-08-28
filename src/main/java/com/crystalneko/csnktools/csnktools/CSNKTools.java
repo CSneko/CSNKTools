@@ -1,13 +1,13 @@
 package com.crystalneko.csnktools.csnktools;
-
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-
 public final class CSNKTools extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         Bukkit.getConsoleSender().sendMessage(
                 "____________________________________\n" +
                         "|\n" +
@@ -22,8 +22,31 @@ public final class CSNKTools extends JavaPlugin {
                         "|\n" +
                         "|CSNKTools V0.0.1 作者:CrystalNeko\n" +
                         "____________________________________");
-    }
+        //创建配置变量
+        FileConfiguration config = this.getConfig();
+        //创建默认配置
+        config.addDefault("Enable", true);
+        config.options().copyDefaults(true);
+        saveConfig();
+        //判断插件配置是否启用
+        if (config.getBoolean("Enable")) {
+            //加载类readconfig
+            readconfig();
+        } else{
+            Bukkit.getConsoleSender().sendMessage("[CT]插件为禁用状态");
+        }
 
+    }
+    public void readconfig() {
+        Bukkit.getConsoleSender().sendMessage("[CT]插件为启用状态，开始加载配置");
+        //注册命令
+        getCommand("csnktools").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.commandhelp());
+        getCommand("csnktools.help").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.commandhelp());
+        getCommand("csnktools.about").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.commandabout());
+
+
+
+    }
     @Override
     public void onDisable() {
         // Plugin shutdown logic
