@@ -1,0 +1,4 @@
+name: CSNKTools
+version: '${project.version}'
+main: com.crystalneko.csnktools.csnktools.CSNKTools
+api-version: '1.20'
