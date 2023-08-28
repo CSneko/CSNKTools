@@ -10,15 +10,3 @@ commands:
     description: CSNKTools命令
     usage: /csnktools
     aliases: [ct, ckt]
-  csnktools.help:
-    permission: ct.command.help
-    permission-message: §c你没有权限执行这条命令!
-    description: CSNKTools命令帮助
-    usage: /csnktools help
-    aliases: [ct help, ckt help]
-  csnktools.about:
-    permission: ct.command.about
-    permission-message: §c你没有权限执行这条命令!
-    description: 关于CSNKTools
-    usage: /csnktools about
-    aliases: [ct about, ckt about]

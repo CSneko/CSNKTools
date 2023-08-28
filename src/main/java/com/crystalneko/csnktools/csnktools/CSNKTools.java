@@ -1,9 +1,10 @@
 package com.crystalneko.csnktools.csnktools;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import com.crystalneko.csnktools.csnktools.CTcommand.csnktools;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.command.CommandExecutor;
 public final class CSNKTools extends JavaPlugin {
 
     @Override
@@ -40,9 +41,7 @@ public final class CSNKTools extends JavaPlugin {
     public void readconfig() {
         Bukkit.getConsoleSender().sendMessage("[CT]插件为启用状态，开始加载配置");
         //注册命令
-        getCommand("csnktools").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.commandhelp());
-        getCommand("csnktools.help").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.commandhelp());
-        getCommand("csnktools.about").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.commandabout());
+        getCommand("csnktools").setExecutor(new com.crystalneko.csnktools.csnktools.CTcommand.csnktools());
 
 
 
