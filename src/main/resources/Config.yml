@@ -1,0 +1,21 @@
+# 插件总开关
+Enable: true
+player:
+  join:
+    # 是否开启登陆消息
+    Enable: true
+    # 登陆时发送的消息
+    Message: 欢迎%player_name%加入服务器
+Scoreboard:
+  # 是否启用计分板
+  Enable: true
+  # 计分板标题
+  title: CSNKTools
+  # 计分板内容
+  line:
+    - 名称:%player_name%
+    - 等级:%player_level%
+    - 延迟:%player_ping%
+    - null
+  # 计分板更新时间
+  update: 5
