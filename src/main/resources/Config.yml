@@ -16,6 +16,5 @@ Scoreboard:
     - 名称:%player_name%
     - 等级:%player_level%
     - 延迟:%player_ping%
-    - null
-  # 计分板更新时间
-  update: 5
+  # 计分板更新时间(tick)
+  update: 20

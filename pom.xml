@@ -6,7 +6,7 @@
 
     <groupId>com.crystalneko.CSNKTools</groupId>
     <artifactId>CSNKTools</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
     <packaging>jar</packaging>
 
     <name>CSNKTools</name>

@@ -1,5 +1,5 @@
 name: CSNKTools
-version: '0.0.2'
+version: '0.0.3'
 main: com.crystalneko.csnktools.csnktools.CSNKTools
 api-version: '1.20'
 author: CrystalNeko

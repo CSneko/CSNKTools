@@ -29,7 +29,7 @@ public class csnktools implements CommandExecutor {
             player.sendMessage("§a使用方法: \n§b/csnktools help §3获取帮助\n§b/csnktools about §3关于");
         } else if (args[0].equalsIgnoreCase("about")) {
             // 执行子命令2的逻辑
-            player.sendMessage("§6版本:§aV0.0.1 §e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools");
+            player.sendMessage("§6版本:§aV0.0.3 §e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools");
         } else {
             // 无效的子命令
             player.sendMessage("§c无效的子命令");

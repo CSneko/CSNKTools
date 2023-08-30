@@ -5,15 +5,23 @@ import com.crystalneko.csnktools.csnktools.CTTool.loginmsg;
 import com.crystalneko.csnktools.csnktools.CTcommand.csnktools;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scheduler.*;
 import java.io.File;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class CSNKTools extends JavaPlugin {
+public final class CSNKTools extends JavaPlugin implements Listener {
     private File configFile;
+    private BukkitScheduler scheduler;
     private FileConfiguration config;
     private loginmsg loginMsgListener;
+    private CTScoreboard CTScoreboardListener;
+    private final Map<Player, Scoreboard> playerScoreboards = new HashMap<>();
+
     @Override
     public void onEnable() {
         Bukkit.getConsoleSender().sendMessage(
@@ -28,7 +36,7 @@ public final class CSNKTools extends JavaPlugin {
                         "|  ||----------|      ||\n" +
                         "|  \\\\----------|      --\n" +
                         "|\n" +
-                        "|CSNKTools V0.0.1 作者:CrystalNeko\n" +
+                        "|CSNKTools V0.0.3 作者:CrystalNeko\n" +
                         "____________________________________");
         // 创建一个名为config.yml的配置文件
         configFile = new File(getDataFolder(), "Config.yml");
@@ -39,40 +47,37 @@ public final class CSNKTools extends JavaPlugin {
             saveResource("Config.yml", false);
         }
 
-        //判断插件配置是否启用
+        // 判断插件配置是否启用
         if (config.getBoolean("Enable")) {
-            //加载类readconfig
+            // 加载类readconfig
             readconfig();
-        } else{
+        } else {
             Bukkit.getConsoleSender().sendMessage("[CT]插件为禁用状态");
         }
-
     }
+
     public void readconfig() {
         Bukkit.getConsoleSender().sendMessage("[CT]插件为启用状态，开始加载配置");
-        //注册命令
+        // 注册命令
         getCommand("csnktools").setExecutor(new csnktools());
-        //加载配置登陆提示语
-        if (getConfig().getBoolean("player.join.Enable")){
+        // 加载配置登陆提示语
+        if (getConfig().getBoolean("player.join.Enable")) {
             // 注册监听器
             loginMsgListener = new loginmsg();
             getServer().getPluginManager().registerEvents(loginMsgListener, this);
             loginMsgListener.loadConfig();
         }
-        // 加载配置计分板
+        //加载计分板
         if (getConfig().getBoolean("Scoreboard.Enable")) {
-            CTScoreboard ctscoreboard = new CTScoreboard(this);
-            getServer().getPluginManager().registerEvents(ctscoreboard, this);
 
-            // 玩家加入服务器时创建计分板
-            getServer().getPluginManager().registerEvents(new PlayerJoinListener(ctscoreboard), this);
+            // 注册监听器
+            CTScoreboardListener = new CTScoreboard(getConfig(), this);
+            getServer().getPluginManager().registerEvents(CTScoreboardListener,this);
+            CTScoreboardListener.loadConfig();
         }
-
-
     }
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
         Bukkit.getConsoleSender().sendMessage(
                 "____________________________________\n" +
                         "|\n" +
@@ -85,7 +90,7 @@ public final class CSNKTools extends JavaPlugin {
                         "|  ||----------|      ||\n" +
                         "|  \\\\----------|      --\n" +
                         "|\n" +
-                        "|CSNKTools V0.0.1 作者:CrystalNeko\n" +
+                        "|CSNKTools V0.0.3 作者:CrystalNeko\n" +
                         "____________________________________");
     }
 

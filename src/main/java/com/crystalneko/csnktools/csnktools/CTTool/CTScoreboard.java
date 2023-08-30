@@ -1,116 +1,94 @@
 package com.crystalneko.csnktools.csnktools.CTTool;
 
+import com.crystalneko.csnktools.csnktools.CSNKTools;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scoreboard.Team;
-
+import org.bukkit.scheduler.*;
 import java.util.List;
-import java.util.UUID;
 
 public class CTScoreboard implements Listener {
 
+
+    private List<String> ScoreboardLine;
+    private String ScoreboardTitle;
+    private int taskID;
+    FileConfiguration config = JavaPlugin.getPlugin(com.crystalneko.csnktools.csnktools.CSNKTools.class).getConfig();
     private final JavaPlugin plugin;
-    private final ScoreboardManager scoreboardManager;
-    private final Scoreboard scoreboard;
-    private Objective objective;
-
-    public CTScoreboard(JavaPlugin plugin) {
+    public CTScoreboard(FileConfiguration config, JavaPlugin plugin) {
+        this.config = config;
         this.plugin = plugin;
-        this.scoreboardManager = Bukkit.getScoreboardManager();
-        this.scoreboard = scoreboardManager.getNewScoreboard();
+        loadConfig();
     }
 
-    public void createScoreboard(Player player) {
-        if (scoreboard.getObjective("ctscoreboard") != null) {
-            objective = scoreboard.getObjective("ctscoreboard");
+    public List<String> loadConfig() {
+        FileConfiguration config = JavaPlugin.getPlugin(com.crystalneko.csnktools.csnktools.CSNKTools.class).getConfig();
+        List<String> ScoreboardLine = config.getStringList("Scoreboard.line");
+        ScoreboardTitle = config.getString("Scoreboard.title");
+        return ScoreboardLine;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onJoin(PlayerJoinEvent event) {
+        ScoreboardLine = loadConfig();
+        //获取加入的玩家
+        Player player = event.getPlayer();
+        // 使用"setPlaceholders"解析占位符。
+        ScoreboardLine = PlaceholderAPI.setPlaceholders(event.getPlayer(), ScoreboardLine);
+        ScoreboardTitle = PlaceholderAPI.setPlaceholders(event.getPlayer(), ScoreboardTitle);
+        setScoreboard(player,ScoreboardLine);
+        startTask(); // 启动定时任务
+    }
+    public void onQuit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        player.getScoreboard().clearSlot(DisplaySlot.SIDEBAR);
+
+        // 在玩家退出时取消定时任务
+        Bukkit.getScheduler().cancelTask(taskID);
+    }
+    private void setScoreboard(Player player, List<String> scoreboardLine1) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
+        //创建计分板
+        Objective objective = scoreboard.getObjective("CTScoreboard");
+        if (objective == null) {  // 如果没有现有的目标对象，则创建一个新的目标对象
+            objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", ScoreboardTitle);
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR); // 设置显示位置
         } else {
-            objective = scoreboard.registerNewObjective("ctscoreboard", "dummy");
-        }
-        String displayName = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Scoreboard.title"));
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-        List<String> lines = plugin.getConfig().getStringList("Scoreboard.line");
-        int score = lines.size();
-
-        for (String line : lines) {
-            String replacedLine = replaceVariables(player, line);
-
-            if (scoreboard.getTeam(replacedLine) == null) {
-                Team team = scoreboard.registerNewTeam(getUniqueTeamName(score));
-                team.addEntry(replacedLine);
-                team.setPrefix(replacedLine);
-            }
-
-            objective.getScore(replacedLine).setScore(score);
-            score--;
+            objective.unregister(); // 取消注册旧的目标对象
+            objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", ScoreboardTitle);
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR); // 设置显示位置
         }
 
+        // 添加计分板内容
+        int score = scoreboardLine1.size();
+        for (String line : ScoreboardLine) {
+            objective.getScore(line).setScore(score--);
+        }
+        // 设置玩家的计分板
         player.setScoreboard(scoreboard);
-        startScoreboardUpdateTask(player);
     }
 
-    public void updateScoreboard(Player player) {
-        objective.setDisplayName(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("Scoreboard.title")));
-
-        List<String> lines = plugin.getConfig().getStringList("Scoreboard.line");
-        int score = lines.size();
-
-        for (String line : lines) {
-            String replacedLine = replaceVariables(player, line);
-            Team team = scoreboard.getTeam(replacedLine);
-            if (team != null) {
-                team.setPrefix(replacedLine);
-                objective.getScore(replacedLine).setScore(score);
-                score--;
-            }
-        }
+    public void startTask() {
+        int updateInterval = config.getInt("Scoreboard.update");
+        taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            loadConfig();
+            Bukkit.getServer().getOnlinePlayers().forEach(player -> setScoreboard(player, ScoreboardLine));
+        }, updateInterval, updateInterval);
     }
-
-    public void removeScoreboard(Player player) {
-        player.setScoreboard(scoreboardManager.getMainScoreboard());
-    }
-
-    public void startScoreboardUpdateTask(Player player) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (player.isOnline()) {
-                    updateScoreboard(player);
-                } else {
-                    cancel();
-                }
-            }
-        }.runTaskTimer(plugin, 0L, plugin.getConfig().getInt("Scoreboard.update") * 20L);
-    }
-
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        createScoreboard(event.getPlayer());
-    }
-
-    private String replaceVariables(Player player, String line) {
-        // 使用 PlaceholderAPI 替换变量
-        String replacedLine = PlaceholderAPI.setPlaceholders(player, line);
-
-        return ChatColor.translateAlternateColorCodes('&', replacedLine);
-    }
-
-
-    private String getUniqueTeamName(int score) {
-        return "line" + score + "_" + UUID.randomUUID().toString();
-    }
-
-    // 省略 getPlayerVariable 方法，因为逻辑已经使用 PAPI 替换完成
 }
+
+
+
+
