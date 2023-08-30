@@ -13,10 +13,10 @@
 - 更多的功能
 
 ### 注意事项：
+- 需要[PaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)插件作为前置
 - 当前为Alpha版本，可实现的功能不多，后续会添加更多功能
 - 请使用Spigot及其分支(Paper,Purpur等)，插件可能在CraftBukkit上不起作用
 - 尽可能使用1.20.1，对于1.20.1以下版本不会提供支持
-- 计分板功能目前有问题，无法正常使用
 
 #### 使用方法：丢入Plugins文件夹即可
 ## 配置文件(config.yml):
