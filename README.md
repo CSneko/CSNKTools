@@ -43,4 +43,6 @@ Scoreboard:
   # 计分板更新时间
   update: 5
 ```
-
+## 已知问题：
+- 启动时可能提示插件已禁用，请将服务器根目录/plugins/CSNKTools里面的Config.yml改名为config.yml
+- 计分板刷新时会出现闪一下
