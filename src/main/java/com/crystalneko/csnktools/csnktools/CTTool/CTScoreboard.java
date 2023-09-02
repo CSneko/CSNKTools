@@ -15,80 +15,98 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
-import org.bukkit.scheduler.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class CTScoreboard implements Listener {
-
-
-    private List<String> ScoreboardLine;
-    private String ScoreboardTitle;
+    private List<String> scoreboardLine;
+    private String scoreboardTitle;
     private int taskID;
-    FileConfiguration config = JavaPlugin.getPlugin(com.crystalneko.csnktools.csnktools.CSNKTools.class).getConfig();
-    private final JavaPlugin plugin;
+    private JavaPlugin plugin;
+
     public CTScoreboard(FileConfiguration config, JavaPlugin plugin) {
-        this.config = config;
         this.plugin = plugin;
         loadConfig();
     }
 
     public List<String> loadConfig() {
-        FileConfiguration config = JavaPlugin.getPlugin(com.crystalneko.csnktools.csnktools.CSNKTools.class).getConfig();
-        List<String> ScoreboardLine = config.getStringList("Scoreboard.line");
-        ScoreboardTitle = config.getString("Scoreboard.title");
-        return ScoreboardLine;
+        FileConfiguration config = plugin.getConfig();
+        this.scoreboardTitle = config.getString("Scoreboard.title");
+        List<String> scoreboardLine = config.getStringList("Scoreboard.line");
+        this.scoreboardLine = scoreboardLine;
+        return scoreboardLine;
+    }
+    private List<String> parsePlaceholders(List<String> scoreboardLines, Player player) {
+        List<String> parsedLines = new ArrayList<>();
+        for (String line : scoreboardLines) {
+            String parsedLine = PlaceholderAPI.setPlaceholders(player, line);
+            parsedLines.add(parsedLine);
+        }
+        return parsedLines;
+    }
+
+
+
+    public String getMessage(String key) {
+        CSNKTools csnkTools = (CSNKTools) plugin;
+        return csnkTools.getMessage(key);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
-        ScoreboardLine = loadConfig();
-        //获取加入的玩家
         Player player = event.getPlayer();
-        // 使用"setPlaceholders"解析占位符。
-        ScoreboardLine = PlaceholderAPI.setPlaceholders(event.getPlayer(), ScoreboardLine);
-        ScoreboardTitle = PlaceholderAPI.setPlaceholders(event.getPlayer(), ScoreboardTitle);
-        setScoreboard(player,ScoreboardLine);
-        startTask(); // 启动定时任务
+        scoreboardLine = loadConfig();
+        if (scoreboardLine == null) {
+            // 处理scoreboardLine为null的情况
+            String noline = getMessage("Scoreboard.noline");
+            Bukkit.getConsoleSender().sendMessage(noline);
+        } else {
+            scoreboardLine = PlaceholderAPI.setPlaceholders(player, scoreboardLine);
+        }
+
+        scoreboardTitle = PlaceholderAPI.setPlaceholders(player, scoreboardTitle);
+        setScoreboard(player, scoreboardLine);
+        startTask();
     }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         player.getScoreboard().clearSlot(DisplaySlot.SIDEBAR);
-
-        // 在玩家退出时取消定时任务
         Bukkit.getScheduler().cancelTask(taskID);
     }
+
     private void setScoreboard(Player player, List<String> scoreboardLine1) {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
-        //创建计分板
         Objective objective = scoreboard.getObjective("CTScoreboard");
-        if (objective == null) {  // 如果没有现有的目标对象，则创建一个新的目标对象
-            objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", ScoreboardTitle);
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR); // 设置显示位置
+        if (objective == null) {
+            objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", scoreboardTitle);
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         } else {
-            objective.unregister(); // 取消注册旧的目标对象
-            objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", ScoreboardTitle);
-            objective.setDisplaySlot(DisplaySlot.SIDEBAR); // 设置显示位置
+            objective.unregister();
+            objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", scoreboardTitle);
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         }
-
-        // 添加计分板内容
-        int score = scoreboardLine1.size();
-        for (String line : ScoreboardLine) {
+        List<String> parsedLines = parsePlaceholders(scoreboardLine1, player); // 解析占位符
+        int score = parsedLines.size();
+        for (String line : parsedLines) {
             objective.getScore(line).setScore(score--);
         }
-        // 设置玩家的计分板
         player.setScoreboard(scoreboard);
     }
 
+
+
     public void startTask() {
+        FileConfiguration config = plugin.getConfig();
         int updateInterval = config.getInt("Scoreboard.update");
+        Bukkit.getScheduler().cancelTask(taskID);
+        List<String> scoreboardLine = loadConfig();
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            loadConfig();
-            Bukkit.getServer().getOnlinePlayers().forEach(player -> setScoreboard(player, ScoreboardLine));
+            Bukkit.getServer().getOnlinePlayers().forEach(player -> setScoreboard(player, scoreboardLine));
         }, updateInterval, updateInterval);
     }
+
 }
-
-
-
-

@@ -1,0 +1,11 @@
+Console:
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.0.4 author:CrystalNeko\n____________________________________"
+  loading: "Plugin is enabled, loading configuration..."
+  disable: "Plugin is disabled"
+Command:
+  ct_OPCDC: "Only players can execute this command"
+Scoreboard:
+  noline: "Failed to obtain configuration file, please check if 'Scoreboard.line' in 'config.yml' is correct"
+  ct_help: "§aUsege:\n§b/csnktools help §3get help\n§b/csnktools about §3about plugins"
+  ct_about: "§6Version:§aV0.0.4,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
+  nocommand: "§cInvalid subcommand"

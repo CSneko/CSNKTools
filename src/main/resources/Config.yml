@@ -1,5 +1,7 @@
 # 插件总开关
 Enable: true
+#设置语言(zh-cn/en-eu)
+language: zh-cn
 player:
   join:
     # 是否开启登陆消息
@@ -18,3 +20,4 @@ Scoreboard:
     - 延迟:%player_ping%
   # 计分板更新时间(tick)
   update: 20
+
