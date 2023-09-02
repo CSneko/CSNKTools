@@ -48,3 +48,5 @@ Scoreboard:
 ## 已知问题：
 - 计分板刷新时会出现闪一下,把刷新间隔调高即可
 - 第一次启动会出现报错，重启即可
+## bStats
+![bStats](https://bstats.org/signatures/bukkit/CSNKTools.svg "bStats")
