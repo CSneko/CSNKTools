@@ -49,3 +49,5 @@ Scoreboard:
 ## Known issues:
 - There will be a flash when the scoreboard is refreshed, just increase the refresh interval
 - There will be an error when starting for the first time, just restart
+## bStats
+![bStats](https://bstats.org/signatures/bukkit/CSNKTools.svg "bStats")
