@@ -379,7 +379,7 @@ public final class CSNKTools extends JavaPlugin implements Listener {
                         "|  ||----------|      ||\n" +
                         "|  \\\\----------|      --\n" +
                         "|\n" +
-                        "|CSNKTools V0.0.4 作者:CrystalNeko\n" +
+                        "|CSNKTools V0.0.5 作者:CrystalNeko\n" +
                         "____________________________________");
     }
 
