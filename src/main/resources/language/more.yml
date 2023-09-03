@@ -1,10 +1,16 @@
 #你可以在这里自定义语言
 Console:
-  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.0.4 作者:CrystalNeko\n____________________________________"
-  loading: "插件为启用状态，正在加载配置"
-  disable: "插件为禁用状态"
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.0.5 作者:CrystalNeko\n____________________________________"
+  loading: "[CT]插件为启用状态，正在加载配置"
+  disable: "[CT]插件为禁用状态"
 Command:
   ct_OPCDC: "只有玩家可以执行这条命令"
-  ct_help: "§a使用方法:\n§b/csnktools help §3获取帮助\n§b/csnktools about §3关于"
-  ct_about: "§6版本:§aV0.0.4 §e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools"
+  ct_help: "§a使用方法:\n§b/csnktools help §3获取帮助\n§b/csnktools about §3关于\n§b/csnktools check §3检查更新"
+  ct_about: "§6版本:§aV0.0.5 §e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools"
   nocommand: "§c无效的子命令"
+System:
+  check-update:
+    update: "[CT]您的插件版本不是最新的，请前往https://github.com/csneko/csnktools下载最新版本"
+    is-update: "[CT]当前已经是最新版本"
+    warning: "[CT]检查更新失败。响应状态码:"
+    warning2: "[CT]检查更新失败。异常信息:"

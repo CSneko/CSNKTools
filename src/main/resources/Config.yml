@@ -1,5 +1,3 @@
-# 插件总开关
-Enable: true
 #设置语言(zh-cn/en-eu)
 language: zh-cn
 player:
