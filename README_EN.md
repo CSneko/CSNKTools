@@ -1,53 +1,78 @@
 [中文用户请点击这里](README.md)
 
-# CSNKTools
-### A multifunctional, customizable, open source and free plugin
+#CSNKTools
+### A multifunctional, customizable, open source and free plug-in
 ## What can it do?
 ### In the current version, it can do:
-- When a player joins the game, the whole server broadcasts a custom message, and supports PlaceholdAPI
-- Support custom scoreboard of PlaceholderAPI
-- Works almost perfectly with PlaceholderAPI
-- Fully customizable feature switches
+- When a player joins the game, the entire server broadcasts a custom message and supports PlaceholdAPI
+- Custom scoreboard with PlaceholderAPI support
+- Almost perfect cooperation with PlaceholderAPI
+- Fully customizable function switches
 
 ### Future plan:
 - Add Bossbar
 - Add gift package function
-- more functions
+- More features
 
 ### Precautions:
-- Requires the [PaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) plugin as a front
-- It is currently an Alpha version, and there are not many functions that can be realized, and more functions will be added in the future
-- Please use Spigot and its branches (Paper, Purpur, etc.), the plugin may not work on CraftBukkit
-- Use 1.20.1 if possible, no support for versions below 1.20.1
+- Music must be in nbs format!!! [How to convert to nbs format?](nbs_EN.md)
 
-#### How to use: drop it into the Plugins folder
+### Pre-plugin (optional):
+
+- Login message, scoreboard: [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
+- Music: [NoteblockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/)
+
 ## Configuration file (config.yml):
 ```yaml
-# Plugin master switch
-Enable: true
 #Set language (zh-cn/en-eu)
 language: zh-cn
 player:
    join:
-     # Whether to open the login message
+     # Whether to enable login message
      Enable: true
-     # Message sent when logging in
+     #Message sent when logging in
      Message: Welcome %player_name% to join the server
 Scoreboard:
-   # Whether to enable the scoreboard
+   # Whether to enable scoreboard
    Enable: true
    # Scoreboard title
    title: CSNKTools
    # Scoreboard content
    line:
-     - 名称: %player_name%
-     - 等级: %player_level%
-     - 延迟: %player_ping%
+     - Name:%player_name%
+     - Level:%player_level%
+     - Delay:%player_ping%
    # Scoreboard update time (tick)
    update: 20
+Music:
+   Enable: true
+   distance: 4
+   #CloudMusicPlease enter the link
+   qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
+   #Please put local music into the music folder, and fill in the link as www
+   badapple: "www"
+```
+## Commands & Permissions:
+```yaml
+#The first line is the command
+#Second line permissions
+
+/csnktools #Plug-in main command (can be abbreviated as /ct or /cst)
+ct.command
+
+/csnktools about #Plug-in information
+ct.command.about
+
+/csnktools check #Check for updates
+ct.command.check
+
+/csnktools playsound <song name> #Play music
+ct.command.playsound
+
+/csnktools soundurl <URL> #Get music from the link
+ct.command.soundurl
 ```
 ## Known issues:
-- There will be a flash when the scoreboard is refreshed, just increase the refresh interval
-- There will be an error when starting for the first time, just restart
+- An error may appear when starting for the first time. Just restart.
 ## bStats
 ![bStats](https://bstats.org/signatures/bukkit/CSNKTools.svg "bStats")

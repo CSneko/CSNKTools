@@ -14,16 +14,15 @@
 - 更多的功能
 
 ### 注意事项：
-- 需要[PaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)插件作为前置
-- 当前为Alpha版本，可实现的功能不多，后续会添加更多功能
-- 请使用Spigot及其分支(Paper,Purpur等)，插件可能在CraftBukkit上不起作用
-- 尽可能使用1.20.1，对于1.20.1以下版本不会提供支持
+- 音乐必须使用nbs格式!!! [如何转换为nbs格式?](nbs.md)
 
-#### 使用方法：丢入Plugins文件夹即可
+### 前置插件（可选）:
+
+- 登陆消息,计分板：[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
+- 音乐：[NoteblockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/)
+
 ## 配置文件(config.yml):
 ```yaml
-# 插件总开关
-Enable: true
 #设置语言(zh-cn/en-eu)
 language: zh-cn
 player:
@@ -44,9 +43,35 @@ Scoreboard:
     - 延迟:%player_ping%
   # 计分板更新时间(tick)
   update: 20
+Music:
+  Enable: true
+  distance: 4
+  #云端音乐请输入链接
+  qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
+  #本地音乐请放入music文件夹，链接请填写为www
+  badapple: "www"
+```
+## 命令&权限:
+```yaml
+#第一行为命令
+#第二行为权限
+
+/csnktools   #插件主命令（可简写为/ct或/cst）
+ct.command
+
+/csnktools about   #插件信息
+ct.command.about
+
+/csnktools check   #检查更新
+ct.command.check
+
+/csnktools playsound <曲名>  #播放音乐
+ct.command.playsound
+
+/csnktools soundurl <URL>   #从链接获取音乐
+ct.command.soundurl
 ```
 ## 已知问题：
-- 计分板刷新时会出现闪一下,把刷新间隔调高即可
-- 第一次启动会出现报错，重启即可
+- 第一次启动可能出现报错，重启即可
 ## bStats
 ![bStats](https://bstats.org/signatures/bukkit/CSNKTools.svg "bStats")
