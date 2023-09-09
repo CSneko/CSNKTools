@@ -18,4 +18,10 @@ Scoreboard:
     - 延迟:%player_ping%
   # 计分板更新时间(tick)
   update: 20
-
+Music:
+  Enable: true
+  distance: 4
+  #云端音乐请输入链接
+  qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
+  #本地音乐请放入music文件夹，链接请填写为www
+  badapple: "www"

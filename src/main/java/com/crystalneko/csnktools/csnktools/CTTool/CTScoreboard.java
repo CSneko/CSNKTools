@@ -1,6 +1,7 @@
 package com.crystalneko.csnktools.csnktools.CTTool;
 
 import com.crystalneko.csnktools.csnktools.CSNKTools;
+import com.crystalneko.csnktools.csnktools.CTcommand.download;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,12 +11,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,17 +28,22 @@ public class CTScoreboard implements Listener {
     private String scoreboardTitle;
     private int taskID;
     private JavaPlugin plugin;
+    private Boolean papiEnable;
 
-    public CTScoreboard(FileConfiguration config, JavaPlugin plugin) {
+    public CTScoreboard(JavaPlugin plugin,Boolean papienable) {
         this.plugin = plugin;
-        loadConfig();
+        lloadConfig();
+        //设置papiEnable的值
+        papiEnable = papienable;
     }
 
-    public List<String> loadConfig() {
-        FileConfiguration config = plugin.getConfig();
-        this.scoreboardTitle = config.getString("Scoreboard.title");
-        List<String> scoreboardLine = config.getStringList("Scoreboard.line");
-        this.scoreboardLine = scoreboardLine;
+    public List<String> lloadConfig() {
+
+            FileConfiguration config = plugin.getConfig();
+            this.scoreboardTitle = config.getString("Scoreboard.title");
+            List<String> scoreboardLine = config.getStringList("Scoreboard.line");
+            this.scoreboardLine = scoreboardLine;
+
         return scoreboardLine;
     }
     private List<String> parsePlaceholders(List<String> scoreboardLines, Player player) {
@@ -56,7 +65,7 @@ public class CTScoreboard implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        scoreboardLine = loadConfig();
+        scoreboardLine = lloadConfig();
         if (scoreboardLine == null) {
             // 处理scoreboardLine为null的情况
             String noline = getMessage("Scoreboard.noline");
@@ -89,10 +98,20 @@ public class CTScoreboard implements Listener {
             objective = scoreboard.registerNewObjective("CTScoreboard", "dummy", scoreboardTitle);
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         }
-        List<String> parsedLines = parsePlaceholders(scoreboardLine1, player); // 解析占位符
-        int score = parsedLines.size();
-        for (String line : parsedLines) {
-            objective.getScore(line).setScore(score--);
+        //判断是否启用PAPI
+        if (papiEnable) {
+            List<String> parsedLines = parsePlaceholders(scoreboardLine1, player); // 解析占位符
+
+            int score = parsedLines.size();
+            for (String line : parsedLines) {
+                objective.getScore(line).setScore(score--);
+            }
+        }else{
+            //没有启动PAPI，不解析占位符
+            int score = scoreboardLine1.size();
+            for (String line : scoreboardLine1) {
+                objective.getScore(line).setScore(score--);
+            }
         }
         player.setScoreboard(scoreboard);
     }
@@ -103,10 +122,19 @@ public class CTScoreboard implements Listener {
         FileConfiguration config = plugin.getConfig();
         int updateInterval = config.getInt("Scoreboard.update");
         Bukkit.getScheduler().cancelTask(taskID);
-        List<String> scoreboardLine = loadConfig();
+        List<String> scoreboardLine = lloadConfig();
         taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
             Bukkit.getServer().getOnlinePlayers().forEach(player -> setScoreboard(player, scoreboardLine));
         }, updateInterval, updateInterval);
+    }
+
+    private boolean isPluginLoaded(String pluginName) {
+        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+        Plugin targetPlugin = pluginManager.getPlugin(pluginName);
+        if (targetPlugin != null && targetPlugin.isEnabled()) {
+            return true;
+        }
+        return false;
     }
 
 }

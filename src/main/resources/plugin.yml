@@ -1,13 +1,32 @@
 name: CSNKTools
-version: '0.0.5'
+version: '0.0.6'
 main: com.crystalneko.csnktools.csnktools.CSNKTools
 api-version: '1.20'
 author: CrystalNeko
-softdepend: [PlaceholderAPI]
+softdepend:
+  - PlaceholderAPI
+  - NoteBlockAPI
 commands:
   csnktools:
-    permission: ct.command
-    permission-message: §c你没有权限执行这条命令!
     description: CSNKTools命令
     usage: /csnktools
     aliases: [ct, ckt]
+permissions:
+  ct.command:
+    description: 允许使用/ct命令
+    default: true
+  ct.command.help:
+    description: 允许使用/ct help命令
+    default: true
+  ct.command.about:
+    description: 允许使用/ct about命令
+    default: true
+  ct.command.check:
+    description: 允许使用/ct check命令
+    default: true
+  ct.command.playsound:
+    description: 允许使用/ct playsound命令
+    default: true
+  ct.command.soundurl:
+    description: 允许使用/ct soundurl命令
+    default: true

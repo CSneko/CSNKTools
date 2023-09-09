@@ -1,16 +1,20 @@
 package com.crystalneko.csnktools.csnktools;
 
 import com.crystalneko.csnktools.csnktools.CTTool.CTScoreboard;
+import com.crystalneko.csnktools.csnktools.CTTool.Music;
 import com.crystalneko.csnktools.csnktools.CTTool.loginmsg;
 import com.crystalneko.csnktools.csnktools.CTcommand.csnktools;
 import com.crystalneko.csnktools.csnktools.CTcommand.csnktoolsTabCompleter;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Note;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scheduler.*;
@@ -18,29 +22,33 @@ import org.bukkit.scheduler.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.file.Files;
+/*import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;*/
 
 
 public final class CSNKTools extends JavaPlugin implements Listener {
 
+    private String pluginVersion;
     private File configFile;
-    private BukkitScheduler scheduler;
     private FileConfiguration config;
     private loginmsg loginMsgListener;
     private CTScoreboard CTScoreboardListener;
-    private final Map<Player, Scoreboard> playerScoreboards = new HashMap<>();
+    private Music musicListener;
     private FileConfiguration languageConfig;
     private String language;
+
+
+
 
 
     @Override
     public void onEnable() {
         int pluginId = 19702; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, pluginId);
+
 
         // 创建一个名为config.yml的配置文件
         configFile = new File(getDataFolder(), "config.yml");
@@ -67,42 +75,66 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         // 创建语言文件
         createLanguageFiles();
 
+        // 获取插件版本
+        pluginVersion = getDescription().getVersion();
+
+        // 保存插件版本到配置文件
+        savePluginVersionToConfig();
+
+
         // 加载语言文件
         loadLanguageFile();
+
 
 
         //加载消息
         String enableplugin = getMessage("Console.enable");
         Bukkit.getConsoleSender().sendMessage(enableplugin);
-            //检查更新
-            checkUpdates();
-            // 注册命令执行器
-            getCommand("csnktools").setExecutor(new csnktools(this));
-            // 注册 Tab 补全
-            getCommand("csnktools").setTabCompleter(new csnktoolsTabCompleter());
-            // 加载类readconfig
-            readconfig();
+        //检查更新
+        checkUpdates();
+        // 加载类readconfig
+        readconfig();
     }
 
     public void readconfig() {
+        //检查PAPI是否启用
+        Boolean papienable = (isPluginLoaded("PlaceholderAPI"));
+        if(papienable) {}else{
+            String NOPAPI = getMessage("Error.NOPAPI");
+            Bukkit.getConsoleSender().sendMessage(NOPAPI);
+        }
+        //检查NBAPI是否启用
+        Boolean nbapienable = (isPluginLoaded("NoteBlockAPI"));
+        if(nbapienable) {}else{
+            String NONBAPI = getMessage("Error.NONBAPI");
+            Bukkit.getConsoleSender().sendMessage(NONBAPI);
+        }
+
+        // 注册命令执行器
+        getCommand("csnktools").setExecutor(new csnktools(this,nbapienable));
+        // 注册 Tab 补全
+        getCommand("csnktools").setTabCompleter(new csnktoolsTabCompleter());
+
+
         String loadingplugin = getMessage("Console.loading");
         Bukkit.getConsoleSender().sendMessage(loadingplugin);
         // 注册命令
-        getCommand("csnktools").setExecutor(new csnktools(this));
+        getCommand("csnktools").setExecutor(new csnktools(this,nbapienable));
         // 加载配置登陆提示语
         if (getConfig().getBoolean("player.join.Enable")) {
+
             // 注册监听器
             loginMsgListener = new loginmsg();
             getServer().getPluginManager().registerEvents(loginMsgListener, this);
-            loginMsgListener.loadConfig();
+            loginMsgListener.loadConfig(papienable);
         }
         //加载计分板
         if (getConfig().getBoolean("Scoreboard.Enable")) {
 
             // 注册监听器
-            CTScoreboardListener = new CTScoreboard(getConfig(), this);
+            CTScoreboardListener = new CTScoreboard(this,papienable);
             getServer().getPluginManager().registerEvents(CTScoreboardListener,this);
-            CTScoreboardListener.loadConfig();
+            CTScoreboardListener.lloadConfig();
         }
 
 
@@ -130,14 +162,20 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         language = getConfig().getString("language");
 
         // 根据语言选项加载对应的语言文件
-        File languageFile = new File(getDataFolder(),  "language/"+ language + ".yml");
+        File languageFile = new File(getDataFolder(), "language/" + language + ".yml");
         if (!languageFile.exists()) {
-            saveResource("language/" +language + ".yml", false);
+            saveResource("language/" + language + ".yml", false);
         }
 
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
 
-
+        // 替换插件版本占位符
+        String versionPlaceholder = "%version%";
+        String translatedVersion = languageConfig.getString("plugin-version");
+        if (translatedVersion != null) {
+            translatedVersion = translatedVersion.replace(versionPlaceholder, pluginVersion);
+            languageConfig.set("plugin-version", translatedVersion);
+        }
     }
 
     // 获取翻译内容的方法
@@ -247,6 +285,22 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         if (oldConfigFile.exists() && !configFile.exists()) {
             oldConfigFile.renameTo(configFile);
         }
+    }
+
+    private void savePluginVersionToConfig() {
+        FileConfiguration config = getConfig();
+        config.set("plugin-version", pluginVersion);
+        saveConfig();
+    }
+
+    //检查特定插件是否启用
+    private boolean isPluginLoaded(String pluginName) {
+        PluginManager pluginManager = Bukkit.getServer().getPluginManager();
+        Plugin targetPlugin = pluginManager.getPlugin(pluginName);
+        if (targetPlugin != null && targetPlugin.isEnabled()) {
+            return true;
+        }
+        return false;
     }
 
     //这一段无法正常运行，因此被注释了
@@ -368,19 +422,24 @@ public final class CSNKTools extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        Bukkit.getConsoleSender().sendMessage("____________________________________\n" +
-                "|\n" +
-                        "|  //----------| |-------------|\n" +
-                        "|  ||----------| |-------------|\n" +
-                        "|  ||\t\t       ||\n" +
-                        "|  ||\t\t       ||\n" +
-                        "|  ||\t\t       ||\n" +
-                        "|  ||\t\t       ||\n" +
-                        "|  ||----------|      ||\n" +
-                        "|  \\\\----------|      --\n" +
-                        "|\n" +
-                        "|CSNKTools V0.0.5 作者:CrystalNeko\n" +
-                        "____________________________________");
+        //清除缓存
+        File tempfolder = new File("plugins/CSNKTools/temp");
+        deleteFolder(tempfolder);
+
+        getMessage("Console.enable");
+        Bukkit.getConsoleSender().sendMessage();
     }
 
+    //清除缓存
+    public static void deleteFolder(File folder) {
+        if (folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    deleteFolder(file);
+                }
+            }
+        }
+        folder.delete();
+    }
 }

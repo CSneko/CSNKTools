@@ -1,17 +1,25 @@
 Console:
-  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.0.5 author:CrystalNeko\n____________________________________"
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.0.6 author:CrystalNeko\n____________________________________"
   loading: "Plugin is enabled, loading configuration..."
   disable: "Plugin is disabled"
 Command:
   ct_OPCDC: "Only players can execute this command"
-Scoreboard:
-  noline: "Failed to obtain configuration file, please check if 'Scoreboard.line' in 'config.yml' is correct"
-  ct_help: "§aUsege:\n§b/csnktools help §3get help\n§b/csnktools about §3about plugins\n§b/csnktools check §3check update"
-  ct_about: "§6Version:§aV0.0.5,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
-  nocommand: "§cInvalid subcommand"
+  ct_help: "§aUsege:\n§b/csnktools help §3get help\n§b/csnktools about §3about plugins\n§b/csnktools check §3check update\n§b/csnktools playsound songname §3play music\n§b/csnktools soundurl URL §3get music form URL"
+  ct_about: "§6Version:§aV0.0.6,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
+  ct_nopermissions: "[CT]You don't hava permissions to use this command!"
+  nocommand: "§cInvalid subcommand or disable"
 System:
   check-update:
     update: "[CT] Your plugin version is not up to date, please go to https://github.com/csneko/csnktools Download the latest version "
     is-update: "[CT] is currently the latest version"
     warning: "[CT]Check for updates failed. Response status code:"
     warning2: "[CT]Failed to check for updates. Exception message:"
+Error:
+  NOPAPI: "[CT]Can't find PlaceholderAPI,placeholder is disable"
+  NONBAPI: "[CT]Can't find NoteBlockAPI,music is disable"
+Plugins:
+  Music:
+    playingsound: "[CT]Start playing"
+    playingerror: "[CT]Can't playing music"
+    temping: "[CT]Downloading music form web to server,please waiting（If the music not playing,please confirm the music is in config）"
+    copyfile: "[CT]Copying music files to temp..."
