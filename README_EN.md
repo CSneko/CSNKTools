@@ -15,7 +15,7 @@
 - More features
 
 ### Precautions:
-- Music must be in nbs format!!! [How to convert to nbs format?](nbs_EN.md)
+- Music must be in nbs format!!! [How to convert to nbs format?](nbs_en.md)
 
 ### Pre-plugin (optional):
 
