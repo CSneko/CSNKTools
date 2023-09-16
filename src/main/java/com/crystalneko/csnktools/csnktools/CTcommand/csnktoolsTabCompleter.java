@@ -33,6 +33,14 @@ public class csnktoolsTabCompleter implements TabCompleter {
                 completions.add("check");
                 completions.add("playsound");
                 completions.add("soundurl");
+                completions.add("feedback");
+            }
+
+        }
+        if (command.getName().equalsIgnoreCase("csnktoolsadmin")) {
+            if (args.length == 1) { // 补全第一个参数
+                completions.add("help");
+                completions.add("download");
             }
 
         }

@@ -1,13 +1,18 @@
 Console:
-  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.0.6 author:CrystalNeko\n____________________________________"
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.1.0 author:CrystalNeko\n____________________________________"
   loading: "Plugin is enabled, loading configuration..."
   disable: "Plugin is disabled"
 Command:
   ct_OPCDC: "Only players can execute this command"
-  ct_help: "§aUsege:\n§b/csnktools help §3get help\n§b/csnktools about §3about plugins\n§b/csnktools check §3check update\n§b/csnktools playsound songname §3play music\n§b/csnktools soundurl URL §3get music form URL"
-  ct_about: "§6Version:§aV0.0.6,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
+  ct_help: "§aUsege:\n§b/csnktools help §3get help\n§b/csnktools about §3about plugins\n§b/csnktools check §3check update\n§b/csnktools playsound songname §3play music\n§b/csnktools soundurl URL §3get music form URL\n§b/csnktools feedback <Title> <Message> §3Seed a feedback"
+  ct_about: "§6Version:§aV0.1.0,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
+  ct_unfeedback: "An error occurred while saving feedback data"
+  ct_feedback: "Your feedback was successfully submitted"
   ct_nopermissions: "[CT]You don't hava permissions to use this command!"
-  nocommand: "§cInvalid subcommand or disable"
+  nocommand: "§cInvalid subcommand or not complete"
+  cta_help: "§Usege:\n§b/csnktoolsadmin help §3get help\n§b/csnktoolsadmin download <URL> <path> §3download file to server"
+  cta_download_start: "[CT]Starting download file..."
+  cta_download_finish: "[CT]Finished download file."
 System:
   check-update:
     update: "[CT] Your plugin version is not up to date, please go to https://github.com/csneko/csnktools Download the latest version "
@@ -17,9 +22,18 @@ System:
 Error:
   NOPAPI: "[CT]Can't find PlaceholderAPI,placeholder is disable"
   NONBAPI: "[CT]Can't find NoteBlockAPI,music is disable"
+  cantdownloadfile: "[CT]Can't download file:"
+  cantmysql: "[CT]Can't Connection to mysql"
+  cantcreatsqlite: "[CT]Can't create file sqlite"
 Plugins:
   Music:
     playingsound: "[CT]Start playing"
     playingerror: "[CT]Can't playing music"
     temping: "[CT]Downloading music form web to server,please waiting（If the music not playing,please confirm the music is in config）"
     copyfile: "[CT]Copying music files to temp..."
+  email:
+  mysql:
+    mysqldriveloaded: "[CT]mysql drive loaded successfully."
+    cantmysqldrive: "[CT]Failed to load MySQL driver."
+    cantcreattable: "[CT]Can't create mysql table:"
+    cantreaddata: "[CT]Can't read mysql database:"

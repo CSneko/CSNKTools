@@ -1,14 +1,13 @@
 package com.crystalneko.csnktools.csnktools;
 
-import com.crystalneko.csnktools.csnktools.CTTool.CTScoreboard;
-import com.crystalneko.csnktools.csnktools.CTTool.Music;
-import com.crystalneko.csnktools.csnktools.CTTool.loginmsg;
+
+import com.crystalneko.csnktools.csnktools.CTTool.*;
 import com.crystalneko.csnktools.csnktools.CTcommand.csnktools;
 import com.crystalneko.csnktools.csnktools.CTcommand.csnktoolsTabCompleter;
 
+import com.crystalneko.csnktools.csnktools.CTcommand.csnktoolsadmin;
+import com.crystalneko.csnktools.csnktools.website.LoginServlet;
 import org.bukkit.Bukkit;
-import org.bukkit.Note;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -16,20 +15,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scheduler.*;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-/*import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;*/
-
 
 public final class CSNKTools extends JavaPlugin implements Listener {
+
 
     private String pluginVersion;
     private File configFile;
@@ -39,6 +37,10 @@ public final class CSNKTools extends JavaPlugin implements Listener {
     private Music musicListener;
     private FileConfiguration languageConfig;
     private String language;
+    private mysqlandemail mysqlAndemail;
+    private mysqlandemail2 mysqlAndemail2;
+    private serverendisable serverendisaBle;
+    private LoginServlet loginServlet;
 
 
 
@@ -50,36 +52,15 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         Metrics metrics = new Metrics(this, pluginId);
 
 
-        // 创建一个名为config.yml的配置文件
-        configFile = new File(getDataFolder(), "config.yml");
-        // 获取配置文件实例
-        config = getConfig();
-        // 如果配置文件不存在，则从插件资源中复制默认的配置文件
-        if (!configFile.exists()) {
-            saveResource("Config.yml", false);
-        }
-        // 检查并修复配置文件名的大小写
-        String configFileName = "config.yml";
-        File configFile = new File(getDataFolder(), configFileName);
-        File oldConfigFile = new File(getDataFolder(), "Config.yml");
-        if (oldConfigFile.exists() && !configFile.exists()) {
-            oldConfigFile.renameTo(configFile);
-        }
+
+        //复制资源文件
+        copyresourceFiles();
 
         //加载配置
         createConfigFile();
 
-        //检查配置
-        //checkConfigFile();
-
         // 创建语言文件
         createLanguageFiles();
-
-        // 获取插件版本
-        pluginVersion = getDescription().getVersion();
-
-        // 保存插件版本到配置文件
-        savePluginVersionToConfig();
 
 
         // 加载语言文件
@@ -112,14 +93,86 @@ public final class CSNKTools extends JavaPlugin implements Listener {
 
         // 注册命令执行器
         getCommand("csnktools").setExecutor(new csnktools(this,nbapienable));
+        getCommand("csnktoolsadmin").setExecutor(new csnktoolsadmin(this));
         // 注册 Tab 补全
         getCommand("csnktools").setTabCompleter(new csnktoolsTabCompleter());
+        getCommand("csnktoolsadmin").setTabCompleter(new csnktoolsTabCompleter());
 
-
+        //插件加载提示语
         String loadingplugin = getMessage("Console.loading");
         Bukkit.getConsoleSender().sendMessage(loadingplugin);
-        // 注册命令
-        getCommand("csnktools").setExecutor(new csnktools(this,nbapienable));
+
+        //初始化mysql
+        mysqlAndemail2 = new mysqlandemail2(this);
+
+        //加载mysql
+        if(getConfig().getBoolean("mysql.Enable")){
+            mysqlAndemail2.loadConfig();
+        }
+        //加载email
+        if (getConfig().getBoolean("smtp.Enable")){
+            mysqlAndemail = new mysqlandemail(this);
+            mysqlAndemail.loadConfig();
+            //加载启动邮件提示
+            if(getConfig().getBoolean("serverendisable.enable")){
+                serverendisaBle = new serverendisable(mysqlAndemail,this,mysqlAndemail2);
+                serverendisaBle.serverenable();
+            }
+        }
+
+
+        //加载网页管理面板
+        if (getConfig().getBoolean("website.Enable")){
+            LoginServlet loginServlet = new LoginServlet(this, mysqlAndemail, mysqlAndemail2);
+            Thread jettyThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        // 创建嵌入式Web服务器
+                        try {
+// 获取服务器的端口号
+                            int port = getConfig().getInt("website.port");
+
+// 实例化Jetty服务器
+                            Server server = new Server(port);
+
+/// 创建ServletContextHandler，并设置上下文路径
+                            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                            context.setContextPath("/");
+                            context.addServlet(new ServletHolder(loginServlet), "/login/*");
+
+// 配置静态资源处理器
+                            ResourceHandler resourceHandler = new ResourceHandler();
+                            String resourceBase = System.getProperty("user.dir") + "/plugins/CSNKTools/website/";
+                            resourceHandler.setResourceBase(resourceBase);
+// 可显示目录结构
+                            resourceHandler.setDirectoriesListed(true);
+
+// 创建处理器集合
+                            HandlerCollection handlers = new HandlerCollection();
+                            handlers.setHandlers(new Handler[]{resourceHandler, context});
+
+                            server.setHandler(handlers);
+
+// 启动服务器
+                            server.start();
+                            server.join();
+
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            jettyThread.start();
+        }
+
+
+
         // 加载配置登陆提示语
         if (getConfig().getBoolean("player.join.Enable")) {
 
@@ -168,14 +221,6 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         }
 
         languageConfig = YamlConfiguration.loadConfiguration(languageFile);
-
-        // 替换插件版本占位符
-        String versionPlaceholder = "%version%";
-        String translatedVersion = languageConfig.getString("plugin-version");
-        if (translatedVersion != null) {
-            translatedVersion = translatedVersion.replace(versionPlaceholder, pluginVersion);
-            languageConfig.set("plugin-version", translatedVersion);
-        }
     }
 
     // 获取翻译内容的方法
@@ -287,11 +332,6 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         }
     }
 
-    private void savePluginVersionToConfig() {
-        FileConfiguration config = getConfig();
-        config.set("plugin-version", pluginVersion);
-        saveConfig();
-    }
 
     //检查特定插件是否启用
     private boolean isPluginLoaded(String pluginName) {
@@ -302,129 +342,47 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         }
         return false;
     }
-
-    //这一段无法正常运行，因此被注释了
-  /*  private void checkConfigFile() {
-        //---------------------------------------------------------------------------------------
-        // 创建一个名为config.yml的配置文件
-        configFile = new File(getDataFolder(), "config.yml");
-        // 获取配置文件实例
-        config = getConfig();
-        // 如果配置文件不存在，则从插件资源中复制默认的配置文件
-        if (!configFile.exists()) {
-            saveResource("Config.yml", false);
-        }
-        // 检查并修复配置文件名的大小写
-        String configFileName = "config.yml";
-        File configFile = new File(getDataFolder(), configFileName);
-        File oldConfigFile = new File(getDataFolder(), "Config.yml");
-        if (oldConfigFile.exists() && !configFile.exists()) {
-            oldConfigFile.renameTo(configFile);
-        }
-        //---------------------------------------------------------------------------------------
-        String sourceFileName = "config.yml";
-        String targetFileName = "newconfig.yml";
-
-        // 获取插件的数据文件夹路径
-        File dataFolder = getDataFolder();
-
-        // 创建源文件和目标文件对象
-        File sourceFile = new File(dataFolder, sourceFileName);
-        File targetFile = new File(dataFolder, targetFileName);
-
-        try {
-            // 复制文件
-            Files.copy(sourceFile.toPath(), targetFile.toPath());
-
-            System.out.println("文件复制成功！");
-        } catch (IOException e) {
-            e.printStackTrace();
+    //复制资源文件
+    private void copyresourceFiles() {
+        // 创建目标文件夹
+        File targetFolder = new File(getDataFolder().getParentFile(), "CSNKTools");
+        if (!targetFolder.exists()) {
+            targetFolder.mkdirs();
         }
 
-        //----------------------------------------------------------------------------------------
-
-        // 创建配置文件对象
-        File dconfigFile = new File(getDataFolder(), "config.yml");
-
-        // 检查配置文件是否存在
-        if (dconfigFile.exists()) {
-            // 删除配置文件
-            boolean deleted = dconfigFile.delete();
-
-            // 检查删除操作是否成功
-            if (deleted) {
-                getLogger().info("配置文件已成功删除。");
-            } else {
-                getLogger().warning("删除配置文件失败。");
-            }
+        // 保存资源文件到目标文件夹
+        checkAndSaveResource("email/serverdisable.html");
+        checkAndSaveResource("email/serverenable.html");
+        checkAndSaveResource("website/index.html");
+        checkAndSaveResource("website/login.html");
+        checkAndSaveResource("website/register.html");
+        checkAndSaveResource("website/user.html");
+        saveResource("language/zh-cn.yml", true);
+        saveResource("language/en-eu.yml", true);
+    }
+    private void checkAndSaveResource(String filePath) {
+        if (!isFileExists(filePath)) {
+            saveResource(filePath, false);
         } else {
-            getLogger().warning("配置文件不存在。");
         }
+    }
 
-        //----------------------------------------------------------------------------------------------
-
-        // 创建一个名为config.yml的配置文件
-        configFile = new File(getDataFolder(), "config.yml");
-        // 获取配置文件实例
-        config = getConfig();
-        // 如果配置文件不存在，则从插件资源中复制默认的配置文件
-        if (!configFile.exists()) {
-            saveResource("Config.yml", false);
-        }
-        // 检查并修复配置文件名的大小写
-        String configFileName11 = "config.yml";
-        File configFile11 = new File(getDataFolder(), configFileName11);
-        File oldConfigFile11 = new File(getDataFolder(), "Config.yml");
-        if (oldConfigFile11.exists() && !configFile11.exists()) {
-            oldConfigFile11.renameTo(configFile11);
-        }
-
-        //---------------------------------------------------------------------------------------------------------
-
-        File configFile1 = new File(getDataFolder(), "config.yml");
-        File configFile2 = new File(getDataFolder(), "newconfig.yml");
-        // 加载配置文件1
-        FileConfiguration config1 = YamlConfiguration.loadConfiguration(configFile1);
-
-        // 加载配置文件2
-        FileConfiguration config2 = YamlConfiguration.loadConfiguration(configFile2);
-
-        // 遍历配置文件2的所有键值对，将它们合并到配置文件1中
-        for (String key : config2.getKeys(true)) {
-            if (!config1.contains(key)) {
-                // 如果配置文件1中没有该键，则将键值对添加到配置文件1中
-                config1.set(key, config2.get(key));
-            } else {
-                // 如果配置文件1中已经存在该键，则使用配置文件2中的值覆盖配置文件1中的值
-                config1.set(key, config2.get(key));
-            }
-        }
-
-        try {
-            // 保存合并后的配置文件1
-            config1.save(configFile1);
-            getLogger().info("成功合并并保存配置文件1.");
-        } catch (IOException e) {
-            getLogger().warning("无法保存合并后的配置文件1.");
-            e.printStackTrace();
-        }
-
-
-
-
-    }*/
-
-
-
-
-
-
+    private boolean isFileExists(String filePath) {
+        File file = new File(getDataFolder(), filePath);
+        return file.exists() && file.isFile();
+    }
 
     @Override
     public void onDisable() {
         //清除缓存
         File tempfolder = new File("plugins/CSNKTools/temp");
         deleteFolder(tempfolder);
+        if (getConfig().getBoolean("smtp.Enable")){
+            //加载关闭邮件提示
+            if(getConfig().getBoolean("serverendisable.enable")){
+                serverendisaBle.serverdisable();
+            }
+        }
 
         getMessage("Console.enable");
         Bukkit.getConsoleSender().sendMessage();

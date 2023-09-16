@@ -1,25 +1,39 @@
-#你可以在这里自定义语言
 Console:
-  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V%version% 作者:CrystalNeko\n____________________________________"
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.1.0 作者:CrystalNeko\n____________________________________"
   loading: "[CT]插件为启用状态，正在加载配置"
   disable: "[CT]插件为禁用状态"
 Command:
   ct_OPCDC: "只有玩家可以执行这条命令"
-  ct_help: "§a使用方法:\n§b/csnktools help §3获取帮助\n§b/csnktools about §3关于\n§b/csnktools check §3检查更新\n§b/csnktools playsound 曲名 §3播放音乐"
-  ct_about: "§6版本:§aV0.0.6§e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools"
-  nocommand: "§c无效的子命令或未开启"
+  ct_help: "§a使用方法:\n§b/csnktools help §3获取帮助\n§b/csnktools about §3关于\n§b/csnktools check §3检查更新\n§b/csnktools playsound <曲名> §3播放音乐\n§b/csnktools soundurl <链接> §3从链接获取音乐\n§b/csnktools feedback <标题> <内容> §3发送反馈"
+  ct_about: "§6版本:§aV0.1.0§e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools"
+  ct_unfeedback: "保存反馈数据时发生错误"
+  ct_feedback: "你的反馈已成功提交"
+  ct_nopermissions: "[CT]你没有使用该命令的权限!"
+  nocommand: "§c无效的子命令或参数不足"
+  cta_help: "§a使用方法:\n§b/csnktoolsadmin help §3获取帮助\n§b/csnktoolsadmin download <链接> <路径> §3下载文件到服务器"
+  cta_download_start: "[CT]即将开始下载文件"
+  cta_download_finish: "[CT]文件下载完成"
 System:
   check-update:
-    update: "[CT]您的插件版本不是最新的，请前往https://github.com/csneko/csnktools下载最新版本"
+    update: "[CT]您的插件版本不是最新的，请前往 https://github.com/csneko/csnktools 下载最新版本"
     is-update: "[CT]当前已经是最新版本"
     warning: "[CT]检查更新失败。响应状态码:"
     warning2: "[CT]检查更新失败。异常信息:"
 Error:
   NOPAPI: "[CT]无法找到placeholderapi插件,占位符不会启用"
   NONBAPI: "[CT]无法找到NoteBlockAPI插件,音乐已关闭"
+  cantdownloadfile: "[CT]无法下载文件:"
+  cantmysql: "[CT]无法连接mysql:"
+  cantcreatsqlite: "[CT]无法创建sqlite文件:"
 Plugins:
   Music:
     playingsound: "[CT]开始播放"
-    playingerror: "[CT]音乐播放失败"
-    temping: "[CT]正在缓存音乐，请稍后（如果音乐没有播放，请再次执行该命令）"
+    playingerror: "[CT]音乐播放失败:"
+    temping: "[CT]正在缓存音乐，请稍后（如果音乐没有播放，请确定音乐是否存在）"
     copyfile: "[CT]正在复制音乐文件到缓存..."
+  email:
+  mysql:
+    mysqldriveloaded: "[CT]mysql驱动加载成功"
+    cantmysqldrive: "[CT]无法加载mysql驱动:"
+    cantcreattable: "[CT]无法创建mysql表:"
+    cantreaddata: "[CT]无法读取mysql数据库:"

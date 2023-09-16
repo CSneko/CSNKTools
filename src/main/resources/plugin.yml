@@ -1,5 +1,5 @@
 name: CSNKTools
-version: '0.0.6'
+version: '0.1.0'
 main: com.crystalneko.csnktools.csnktools.CSNKTools
 api-version: '1.20'
 author: CrystalNeko
@@ -11,6 +11,10 @@ commands:
     description: CSNKTools命令
     usage: /csnktools
     aliases: [ct, ckt]
+  csnktoolsadmin:
+    description: CSNKTools命令
+    usage: /csnktoolsadmin
+    aliases: [cta, ckta]
 permissions:
   ct.command:
     description: 允许使用/ct命令
@@ -27,6 +31,13 @@ permissions:
   ct.command.playsound:
     description: 允许使用/ct playsound命令
     default: true
-  ct.command.soundurl:
-    description: 允许使用/ct soundurl命令
+  ct.command.feedback:
+    description: 允许使用/ct feedback命令
     default: true
+  cta.command.help:
+    description: 允许使用/cta help命令
+    default: false
+  cta.command.download:
+    description: 允许使用/cta download命令
+    default: false
+
