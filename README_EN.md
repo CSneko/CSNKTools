@@ -1,5 +1,5 @@
 [中文用户请点击这里](README.md)
-#CSNKTools
+# CSNKTools
 ### A multifunctional, customizable, open source and free plug-in
 ## What can it do?
 ### In the current version, it can do:
@@ -8,7 +8,7 @@
 - Almost perfect cooperation with PlaceholderAPI
 - Fully customizable function switches
 - Build the website on the server
-- Link database
+- Link to database and support sqlite and mysql
 - Players send feedback to the server
 - Email reminder when server starts or shuts down
 
@@ -19,14 +19,77 @@
 
 ### Precautions:
 - Music must be in nbs format!!! [How to convert to nbs format?](nbs.md)
-- sqlite is not currently supported
 
-### Pre-plugin (optional):
+### Pre-plugin:
+- Main: [ctLib](https://github.com/CSneko/ctLib) (required, the plug-in will be downloaded automatically when it is started, or you can download it manually)
+- Login message, scoreboard: [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) (optional)
+- Music: [NoteblockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/) (optional)
+### how to use:
+- First, you need to download it and put it into the ```plugins``` folder of the server. If you have not downloaded the pre-plugin ctLib, the plugin will automatically download it, so you don’t have to worry about the pre-installation problem.
+- Next, the plug-in will generate a configuration file, which you can modify according to your needs. For details, please see the configuration file introduction below.
 
-- Login message, scoreboard: [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
-- Music: [NoteblockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/)
+### Introduction to some main configurations:
+```language```: Language setting, currently supports Simplified Chinese (```zh-cn```), English (```en-eu```) and custom language (```more`` `), you can find them under ```plugins/CSNKTools/language/```
+```website.port```: The port started by the web page cannot be the same as the server port. The access address is ```http://ip:port```. Please replace the ip and port with your own ip and port. port
+### How to use email:
+You can change the email content in the `plugins/CSNKTools/email/` folder
 
-## Configuration file (config.yml):
+You need to set ```smtp.Enable``` to true and fill in your smtp server, smtp port, email address and password in the corresponding positions. The following is an example for using the address ```smtpuser@ outlook.com```, outlook account with password ```smtppassword```:
+```yaml
+#mailsystem
+smtp:
+   Enable: true
+   auth: true
+   starttls: true
+   #smtpserver
+   host: smtp.office365.com
+   #smtpport
+   port: 587
+   #email address
+   username: smtpuser@outlook.com
+   #Email password (authorization code)
+   password: smtppassword
+```
+### How to use database:
+If you use sqlite, you only need to configure the table name, or even nothing else.
+
+If you use mysql, the configuration may be troublesome. The following is an example for connecting to a server with the address `127.0.0.1`, the port `3306`, and the database name `nanoCraft`. The login information is the username: `crystalneko `,Password:`password`
+```yaml
+#mysqldatabase
+mysql:
+   Enable: true
+   #mysqldriver
+   drive: "com.mysql.cj.jdbc.Driver" #Old version driver: com.mysql.jdbc.Driver
+   #mysqlDomain name and port
+   host: 127.0.0.1
+   port: 3306
+   #Database name
+   database: nanoCraft
+   #mysqlservertimezone
+   time: GMT
+   #Whether to use ssl
+   usessl: true
+   #coding
+   char: UTF-8
+   #Username and password
+   username: crystalneko
+   password: password
+```
+### How to use the web page:
+Plug-ins simplify the use of web pages, which means you can easily build web pages
+
+Note: The webpage currently only supports mysql to store data, so you need to configure mysql. The login method of the webpage is exactly the same as the login logic of [AuthMeReloaded](https://www.spigotmc.org/resources/authmereloaded.6269/), so you can Use its database directly
+
+Web page files are stored in the `plugins/CSNKTools/website` folder and can also be changed by yourself. If you feel that the web page that comes with it does not look good, you can perform some beautification operations yourself.
+
+#### Placeholder:
+For all pages in the `plugins/CSNKTools/website/user/` folder, the following placeholders are currently provided:
+
+- Current, maximum online, motd: <online />, <max_online /><motd />
+- Ban, administrator list: <list_ban />, <list_op />
+- Player name,uuid:<player_name />,<player_uuid />
+
+## Configuration file (```config.yml```):
 ```yaml
 #Set language (zh-cn/en-eu)
 language: zh-cn
@@ -55,12 +118,24 @@ Music:
    qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
    #Please put local music into the music folder, and fill in the link as www
    badapple: "www"
+#Feedback function, use /ct feedback <topic> <content> to send feedback
+feedback:
+   Enable: true
+   email:
+     #Whether to enable email reminders (smtp needs to be configured)
+     Enable: false
+     #Email to receive reminders
+     email: expuser@example.com
+     #Email subject, placeholder: player name <player_name>, feedback subject <subject>, feedback time <time>
+     subject: "<player_name> submitted feedback <subject>"
 website: #webpage
    Enable: false
    #User information data table
    user_table: usertable
    #Webport
    port: 8080
+   #Show directory structure
+   dirlist: false
    email:
      #Subject of registration email
      register_subject: "Register Email"
@@ -68,7 +143,7 @@ website: #webpage
 mysql:
    Enable: false
    #mysqldriver
-   drive: "com.mysql.cj.jdbc.Driver"#Old version driver: com.mysql.jdbc.Driver
+   drive: "com.mysql.cj.jdbc.Driver" #Old version driver: com.mysql.jdbc.Driver
    #mysqlDomain name and port
    host: localhost
    port: 3306
@@ -87,6 +162,8 @@ mysql:
 sqlite:
    #sqlite path, do not change it unless necessary
    path: "plugins/CSNKTools/data/data.db"
+   #Player data storage table
+   player_data_table: playerData
 #mailsystem
 smtp:
    Enable: false

@@ -8,7 +8,7 @@
 - 与PlaceholderAPI几乎完美的配合
 - 完全自定义功能开关
 - 在服务器上搭建网站
-- 链接数据库
+- 链接数据库，且支持sqlite和mysql
 - 玩家向服务器发送反馈
 - 服务器启动或关闭时进行邮件提醒
 
@@ -19,14 +19,77 @@
 
 ### 注意事项：
 - 音乐必须使用nbs格式!!! [如何转换为nbs格式?](nbs.md)
-- 目前不支持sqlite
 
-### 前置插件（可选）:
+### 前置插件:
+- 主要:[ctLib](https://github.com/CSneko/ctLib)(必须，插件启动时会自动下载，也可以手动进行下载)
+- 登陆消息,计分板：[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)(可选)
+- 音乐：[NoteblockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/)(可选)
+### 如何使用：
+- 首先，你需要下载它并放入服务器的```plugins```文件夹，如果你没有下载前置插件ctLib，插件会自动下载它，因此不必担心前置问题
+- 接下来，插件会生成一个配置文件，你可以根据需要来自行修改，详情请查看下面的配置文件介绍
 
-- 登陆消息,计分板：[PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/)
-- 音乐：[NoteblockAPI](https://www.spigotmc.org/resources/noteblockapi.19287/)
+### 一些主要配置的介绍:
+```language```:语言设置，目前支持简体中文(```zh-cn```),English(```en-eu```)和自定义语言(```more```),你可以在```plugins/CSNKTools/language/```下找到它们
+```website.port```:网页启动的端口，不能与服务器端口相同,访问地址为```http://ip:port```，请将ip和port换成你自己的ip和端口
+### 邮件使用方法:
+你可以在`plugins/CSNKTools/email/`文件夹内更改邮件内容
 
-## 配置文件(config.yml):
+你需要将```smtp.Enable```设置为true,并在相应位置填入你的smtp服务器，smtp端口，邮件地址和密码，以下是一个示例,用于使用地址为```smtpuser@outlook.com```,密码为```smtppassword```的outlook账户：
+```yaml
+#邮件系统
+smtp:
+  Enable: true
+  auth: true
+  starttls: true
+  #smtp服务器
+  host: smtp.office365.com
+  #smtp端口
+  port: 587
+  #邮箱地址
+  username: smtpuser@outlook.com
+  #邮箱密码（授权码）
+  password: smtppassword
+```
+### 数据库使用方法：
+如果你使用sqlite,你只需要配置表名即可，甚至什么都不用配置
+
+如果你使用mysql,配置可能会比较麻烦，以下是一个示例，用于连接地址为`127.0.0.1`，端口为`3306`，数据库名为`nanoCraft`的服务器，登陆信息为用户名:`crystalneko`,密码:`password`
+```yaml
+#mysql数据库
+mysql:
+  Enable: true
+  #mysql驱动
+  drive: "com.mysql.cj.jdbc.Driver" #旧版驱动: com.mysql.jdbc.Driver
+  #mysql域名及端口
+  host: 127.0.0.1
+  port: 3306
+  #数据库名
+  database: nanoCraft
+  #mysql服务器时区
+  time: GMT
+  #是否使用ssl
+  usessl: true
+  #编码
+  char: UTF-8
+  #用户名及密码
+  username: crystalneko
+  password: password
+```
+### 网页使用方法:
+插件对于网页的使用有所简化，这意味着你可以轻松搭建网页
+
+注意：网页目前仅支持mysql存储数据，因此你需要配置mysql,网页的登陆方式与[AuthMeReloaded](https://www.spigotmc.org/resources/authmereloaded.6269/)的登陆逻辑完全相同,因此可以直接使用它的数据库
+
+网页文件存储在`plugins/CSNKTools/website`文件夹内,同样可以自行更改，如果你觉得自带的网页不好看，可以自己进行一些美化操作
+
+#### 占位符:
+对于`plugins/CSNKTools/website/user/`文件夹内的所有页面，目前提供如下占位符：
+
+- 当前,最大在线,motd：<online />,<max_online /><motd />
+- 封禁，管理员列表:<list_ban />,<list_op />
+- 玩家名称,uuid:<player_name />,<player_uuid />
+
+## 配置文件(```config.yml```):
 ```yaml
 #设置语言(zh-cn/en-eu)
 language: zh-cn
@@ -55,12 +118,24 @@ Music:
   qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
   #本地音乐请放入music文件夹，链接请填写为www
   badapple: "www"
+#反馈功能，使用/ct feedback <主题> <内容> 发送反馈
+feedback:
+  Enable: true
+  email:
+    #是否启用邮件提醒（需要配置smtp）
+    Enable: false
+    #接受提醒的邮箱
+    email: expuser@example.com
+    #邮件主题,占位符：玩家名称<player_name>,反馈主题<subject>,反馈时间<time>
+    subject: "<player_name>提交了反馈<subject>"
 website:  #网页
   Enable: false
   #用户信息数据表
   user_table: usertable
   #网页端口
   port: 8080
+  #显示目录结构
+  dirlist: false
   email:
     #注册邮件的主题
     register_subject: "注册邮件"
@@ -68,7 +143,7 @@ website:  #网页
 mysql:
   Enable: false
   #mysql驱动
-  drive: "com.mysql.cj.jdbc.Driver"#旧版驱动: com.mysql.jdbc.Driver
+  drive: "com.mysql.cj.jdbc.Driver" #旧版驱动: com.mysql.jdbc.Driver
   #mysql域名及端口
   host: localhost
   port: 3306
@@ -87,6 +162,8 @@ mysql:
 sqlite:
   #sqlite路径，如非必要，请勿更改
   path: "plugins/CSNKTools/data/data.db"
+  #玩家数据存储表
+  player_data_table: playerData
 #邮件系统
 smtp:
   Enable: false
