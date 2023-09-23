@@ -1,4 +1,4 @@
-package com.crystalneko.csnktools.csnktools.CTcommand;
+package com.crystalneko.csnktools.CTcommand;
 
 
 
@@ -8,11 +8,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import org.bukkit.entity.Player;
-import com.crystalneko.csnktools.csnktools.CSNKTools;
+import com.crystalneko.csnktools.CSNKTools;
 
 import java.io.IOException;
-
-import static org.bukkit.Bukkit.getServer;
 
 
 public class csnktoolsadmin implements CommandExecutor {

@@ -1,26 +1,17 @@
-package com.crystalneko.csnktools.csnktools.CTcommand;
+package com.crystalneko.csnktools.CTcommand;
 
 
 
-import com.crystalneko.csnktools.csnktools.CTTool.CTScoreboard;
-import com.crystalneko.csnktools.csnktools.CTTool.Music;
+import com.crystalneko.csnktools.CTTool.HtmlPlaceholderConverter;
+import com.crystalneko.csnktools.CTTool.mysqlandemail;
+import com.crystalneko.csnktools.CTTool.Music;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import com.crystalneko.csnktools.csnktools.CSNKTools;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import static org.bukkit.Bukkit.getServer;
+import com.crystalneko.csnktools.CSNKTools;
 
 
 public class csnktools implements CommandExecutor {
@@ -29,11 +20,20 @@ public class csnktools implements CommandExecutor {
     private CSNKTools plugin;
     private Boolean NBAPI;
     private String nopermissions;
+    private feedback feedBack;
+    private mysqlandemail mysqlAndemail;
+    private HtmlPlaceholderConverter htmlPlaceholderConverter;
     private Boolean musicE;
-    public csnktools(CSNKTools plugin,Boolean nbapi) {
+    public csnktools(CSNKTools plugin,Boolean nbapi,mysqlandemail mysqlAndemail,HtmlPlaceholderConverter htmlPlaceholderConverter) {
         this.plugin = plugin;
+
         NBAPI = nbapi;
         nopermissions = plugin.getMessage("Command.ct_nopermissions");
+        //检查反馈是否启用
+        if(plugin.getConfig().getBoolean("feedback.Enable")){
+            feedBack = new feedback(plugin,mysqlAndemail,htmlPlaceholderConverter);
+        }
+
     }
 
     @Override
@@ -126,41 +126,11 @@ public class csnktools implements CommandExecutor {
                 sender.sendMessage(nopermissions);
             }
         }else if(args.length == 3 && args[0].equalsIgnoreCase("feedback")){
+            //反馈命令
             if (sender.hasPermission("ct.command.feedback")){
-                String title = args[1];
-                String content = args[2];
-                // 获取当前时间
-                String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                //获取当前坐标
-                Location location = player.getLocation();
-                double x = location.getX();
-                double y = location.getY();
-                double z = location.getZ();
-                // 获取反馈数据节点
-                FileConfiguration config = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "data/feedback.yml"));
-                ConfigurationSection feedbackSection = config.getConfigurationSection("feedback");
-                if (feedbackSection == null) {
-                    feedbackSection = config.createSection("feedback");
+                if (plugin.getConfig().getBoolean("feedback.Enable")) {
+                    feedBack.feedbackcommand(player, args);
                 }
-
-                // 创建新的反馈节点
-                ConfigurationSection newFeedbackSection = feedbackSection.createSection(title);
-                newFeedbackSection.set("name", player.getName());
-                newFeedbackSection.set("location",x+","+y+","+z);
-                newFeedbackSection.set("time", time);
-                newFeedbackSection.set("feedback", content);
-
-                // 保存反馈文件
-                try {
-                    config.save(new File(plugin.getDataFolder(), "data/feedback.yml"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    String unfeedback = plugin.getMessage("Command.ct_unfeedback");
-                    sender.sendMessage(unfeedback);
-                    return true;
-                }
-                String feedback = plugin.getMessage("Command.ct_feedback");
-                sender.sendMessage(feedback);
             }
         } else {
             // 无效的子命令

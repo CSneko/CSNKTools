@@ -1,4 +1,4 @@
-package com.crystalneko.csnktools.csnktools.CTcommand;
+package com.crystalneko.csnktools.CTcommand;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

@@ -1,8 +1,10 @@
-package com.crystalneko.csnktools.csnktools.website;
+package com.crystalneko.csnktools.website;
 
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Random;
+import java.util.UUID;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -10,9 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.digest.DigestUtils;
 
 
-import com.crystalneko.csnktools.csnktools.CSNKTools;
-import com.crystalneko.csnktools.csnktools.CTTool.mysqlandemail;
-import com.crystalneko.csnktools.csnktools.CTTool.mysqlandemail2;
+import com.crystalneko.csnktools.CSNKTools;
+import com.crystalneko.csnktools.CTTool.mysqlandemail;
+import com.crystalneko.csnktools.CTTool.mysqlandemail2;
 
 public class LoginServlet extends HttpServlet {
     private CSNKTools plugin;
@@ -36,20 +38,26 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-        if (pathInfo.equals("/*")) {
+        if (pathInfo.equals("/login")) {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
 
             boolean authenticated = authenticate(username, password);
-            System.out.println(authenticated);
 
             if (authenticated) {
                 // 登录成功，根据权限跳转到不同页面
-                String permission = mysqlAndemail2.read_table_data("permission", table_name);
+                String permission = mysqlAndemail2.read_table_where_data("permission", table_name,"username",username);
                 if ("admin".equals(permission)) {
                     response.sendRedirect("../admin.html");
                 } else {
-                    response.sendRedirect("../user.html");
+                    //设置是否登陆
+                    // 获取客户端IP地址
+                    String ipAddress = request.getRemoteAddr();
+                    //获取时间戳
+                    long currentTimeStamp = System.currentTimeMillis();
+                    mysqlAndemail2.set_table_data(table_name,"username",username,"logged", String.valueOf(currentTimeStamp));
+                    String redirectUrl = "../user/user?username=" + username;
+                    response.sendRedirect(redirectUrl);
                 }
             } else {
                 // 登录失败，返回登录页面
@@ -60,13 +68,9 @@ public class LoginServlet extends HttpServlet {
             String password = request.getParameter("password");
             String email = request.getParameter("email");
 
-            // 发送邮件验证码
-            sendEmailVerification(username, email);
-
             // 创建用户并保存到数据库
-            //createUser(username, password, email);
+            createUser(username, password, email);
 
-            response.sendRedirect("/plugins/CSNKTools/website/login.html");
         }
     }
 
@@ -110,12 +114,23 @@ public class LoginServlet extends HttpServlet {
         return "$SHA$" + salt + "$" + DigestUtils.sha256Hex(DigestUtils.sha256Hex(password) + salt);
     }
 
-    /*private void createUser(String username, String password, String email) {
+    private String computeHash2(String password) {
+        //生成随即盐值
+        UUID uuid = UUID.randomUUID();
+
+        String salt= uuid.toString().replace("-", "");
+        String hashedPassword = DigestUtils.sha256Hex(password);
+        String saltedPassword = hashedPassword + salt;
+        String combinedHash = DigestUtils.sha256Hex(saltedPassword);
+        return "$SHA$" + salt + "$" + combinedHash;
+    }
+
+    private void createUser(String username, String password, String email) {
         // 创建用户并保存到数据库
-        String hashedPassword = hashPassword(password);
+        String hashedPassword = computeHash2(password);
         String[] data = new String[]{username, hashedPassword, email, "user"};
         mysqlAndemail2.writetable(table_name, "username,password,email,permission", data);
-    }*/
+    }
 
 
 }

@@ -1,4 +1,4 @@
-package com.crystalneko.csnktools.csnktools;
+package com.crystalneko.csnktools;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

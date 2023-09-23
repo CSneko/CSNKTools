@@ -1,11 +1,11 @@
 Console:
-  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.1.0 author:CrystalNeko\n____________________________________"
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.1.1 author:CrystalNeko\n____________________________________"
   loading: "Plugin is enabled, loading configuration..."
   disable: "Plugin is disabled"
 Command:
   ct_OPCDC: "Only players can execute this command"
   ct_help: "§aUsege:\n§b/csnktools help §3get help\n§b/csnktools about §3about plugins\n§b/csnktools check §3check update\n§b/csnktools playsound songname §3play music\n§b/csnktools soundurl URL §3get music form URL\n§b/csnktools feedback <Title> <Message> §3Seed a feedback"
-  ct_about: "§6Version:§aV0.1.0,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
+  ct_about: "§6Version:§aV0.1.1,§eAuthor:§6CrystalNeko,§aproject link:§bhttps://github.com/CSneko/CSNKTools"
   ct_unfeedback: "An error occurred while saving feedback data"
   ct_feedback: "Your feedback was successfully submitted"
   ct_nopermissions: "[CT]You don't hava permissions to use this command!"
@@ -37,3 +37,7 @@ Plugins:
     cantmysqldrive: "[CT]Failed to load MySQL driver."
     cantcreattable: "[CT]Can't create mysql table:"
     cantreaddata: "[CT]Can't read mysql database:"
+  sqlite:
+    createFile: "[CT]SQLite file created successfully."
+    FailedCreateFile: "[CT]Failed to create SQLite file.（This message don't is a error message）"
+    UnableCreateFile: "[CT]Error: Unable to create SQLite file."

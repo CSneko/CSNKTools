@@ -1,7 +1,6 @@
-package com.crystalneko.csnktools.csnktools.CTTool;
+package com.crystalneko.csnktools.CTTool;
 
-import com.crystalneko.csnktools.csnktools.CSNKTools;
-import com.crystalneko.csnktools.csnktools.CTcommand.download;
+import com.crystalneko.csnktools.CSNKTools;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,7 +18,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 

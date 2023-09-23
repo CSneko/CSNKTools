@@ -1,14 +1,11 @@
-package com.crystalneko.csnktools.csnktools.CTTool;
+package com.crystalneko.csnktools.CTTool;
 
-import com.crystalneko.csnktools.csnktools.CSNKTools;
-import com.crystalneko.csnktools.csnktools.CTcommand.download;
+import com.crystalneko.csnktools.CSNKTools;
+import com.crystalneko.csnktools.CTcommand.download;
 
-import com.xxmicloxx.NoteBlockAPI.event.SongDestroyingEvent;
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.EntitySongPlayer;
-import com.xxmicloxx.NoteBlockAPI.songplayer.SongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
 
@@ -18,7 +15,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 
 public class Music {
     private CSNKTools plugin;

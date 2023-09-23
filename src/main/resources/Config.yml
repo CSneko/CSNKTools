@@ -25,12 +25,24 @@ Music:
   qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
   #本地音乐请放入music文件夹，链接请填写为www
   badapple: "www"
+#反馈功能，使用/ct feedback <主题> <内容> 发送反馈
+feedback:
+  Enable: true
+  email:
+    #是否启用邮件提醒（需要配置smtp）
+    Enable: false
+  #接受提醒的邮箱
+    email: expuser@example.com
+  #邮件主题,占位符：玩家名称<player_name>,反馈主题<subject>,反馈时间<time>
+    subject: "<player_name>提交了反馈<subject>"
 website:  #网页
   Enable: false
   #用户信息数据表
   user_table: usertable
   #网页端口
   port: 8080
+  #显示目录结构
+  dirlist: false
   email:
     #注册邮件的主题
     register_subject: "注册邮件"
@@ -38,7 +50,7 @@ website:  #网页
 mysql:
   Enable: false
   #mysql驱动
-  drive: "com.mysql.cj.jdbc.Driver"#旧版驱动: com.mysql.jdbc.Driver
+  drive: "com.mysql.cj.jdbc.Driver" #旧版驱动: com.mysql.jdbc.Driver
   #mysql域名及端口
   host: localhost
   port: 3306
@@ -57,6 +69,8 @@ mysql:
 sqlite:
   #sqlite路径，如非必要，请勿更改
   path: "plugins/CSNKTools/data/data.db"
+  #玩家数据存储表
+  player_data_table: playerData
 #邮件系统
 smtp:
   Enable: false

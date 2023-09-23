@@ -1,10 +1,8 @@
-package com.crystalneko.csnktools.csnktools.CTTool;
+package com.crystalneko.csnktools.CTTool;
 
-import com.crystalneko.csnktools.csnktools.CSNKTools;
+import com.crystalneko.csnktools.CSNKTools;
 import org.bukkit.Bukkit;
 
-import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -43,26 +41,12 @@ public class mysqlandemail2 {
             Bukkit.getConsoleSender().sendMessage(plugin.getMessage("Error.cantmysql"));
         }
 
-        // 执行 SQL 语句
-            String sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = ? AND table_name = ?";
-            try (PreparedStatement statement = mysqlconnection.prepareStatement(sql)) {
-                statement.setString(1, mysqlDatabase);
-                statement.setString(2, "test");
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    if (resultSet.next()) {
-                        int count = resultSet.getInt(1);
-                        // 处理结果
-                    }
-                }
-            } catch (SQLException e) {
-                // 处理异常
-            }
+
     }
 
 
     //mysql连接方法
     public Connection createConnection(String sqlitepath) throws SQLException {
-        if (useMySQL) {
             try {
                 Class.forName(plugin.getConfig().getString("mysql.drive"));
                 Bukkit.getConsoleSender().sendMessage(plugin.getMessage("Plugins.mysql.mysqldriveloaded"));
@@ -74,25 +58,6 @@ public class mysqlandemail2 {
             // 构建MySQL连接字符串
             String mysqlConnectionUrl = "jdbc:mysql://" + mysqlHost + ":" + mysqlPort + "/" + mysqlDatabase+ "?user="+mysqlUsername+ "&password="+mysqlPassword+"password&characterEncoding="+ mysqlchar +"&useSSL="+ mysqlusessl +"&serverTimezone="+mysqltime;
             return DriverManager.getConnection(mysqlConnectionUrl, mysqlUsername, mysqlPassword);
-        } else {
-            // 检查SQLite数据库文件是否存在
-            File sqliteFile = new File(sqlitepath);
-
-            if (!sqliteFile.exists()) {
-                // 如果数据库文件不存在，尝试创建它
-                try {
-                    sqliteFile.createNewFile();
-                }catch (IOException e) {
-                    Bukkit.getConsoleSender().sendMessage(plugin.getMessage("Error.cantcreatsqlite"));
-
-                }
-
-            }
-
-            // 构建SQLite连接字符串
-            String sqliteConnectionUrl = "jdbc:sqlite:" + sqlitepath;
-            return DriverManager.getConnection(sqliteConnectionUrl);
-        }
     }
 
     //创建数据库操作
@@ -115,23 +80,35 @@ public class mysqlandemail2 {
             Bukkit.getConsoleSender().sendMessage( cantcreattable+e);
         }
     }
-    //写入mysql表
-    public void writetable(String tablename,String line,String[] value){
-        try (Statement statement = mysqlconnection.createStatement()) {
-            String result_value=args_toString(value);
-            String insertSql = "INSERT INTO "+tablename+" ("+line+") VALUES ("+result_value+")";
-            statement.executeUpdate(insertSql);
+    // 写入mysql表
+    public void writetable(String tablename, String line, String[] value) {
+        try (PreparedStatement statement = mysqlconnection.prepareStatement("INSERT INTO " + tablename + " (" + line + ") VALUES (" + getPlaceholder(value.length) + ")")) {
+            for (int i = 0; i < value.length; i++) {
+                statement.setString(i + 1, value[i]);
+            }
+            statement.executeUpdate();
         } catch (SQLException e) {
             // 处理异常
             String cantcreattable = plugin.getMessage("mysql.cantcreattable");
-            Bukkit.getConsoleSender().sendMessage( cantcreattable+e);
+            Bukkit.getConsoleSender().sendMessage(cantcreattable + e);
         }
     }
-    //读取数据
+
+    private String getPlaceholder(int count) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            builder.append("?");
+            if (i < count - 1) {
+                builder.append(",");
+            }
+        }
+        return builder.toString();
+    }
+
+    // 读取数据
     public String read_table_data(String columnName, String tableName) {
-        try (Statement statement = mysqlconnection.createStatement()) {
-            String selectSql = "SELECT " + columnName + " FROM " + tableName;
-            ResultSet resultSet = statement.executeQuery(selectSql);
+        try (PreparedStatement statement = mysqlconnection.prepareStatement("SELECT " + columnName + " FROM " + tableName)) {
+            ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 String value = resultSet.getString(columnName);
@@ -145,6 +122,25 @@ public class mysqlandemail2 {
             return null;
         }
     }
+
+    public String read_table_where_data(String columnName, String tableName, String where, String where_name) {
+        try (PreparedStatement statement = mysqlconnection.prepareStatement("SELECT " + columnName + " FROM " + tableName + " WHERE " + where + " = ?")) {
+            statement.setString(1, where_name);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String value = resultSet.getString(columnName);
+                return value;
+            }
+
+            // 如果没有数据，则返回一个默认值
+            return null;
+        } catch (SQLException e) {
+            Bukkit.getConsoleSender().sendMessage(plugin.getMessage("mysql.cantreaddata") + e);
+            return null;
+        }
+    }
+
     //hash操作
     public String read_password_and_salt(String username,String tableName) {
         try (Statement statement = mysqlconnection.createStatement()) {
@@ -162,6 +158,36 @@ public class mysqlandemail2 {
             return null;
         }
     }
+    //写入表的操作
+    public void set_table_data(String tableName, String columnName, String columnValue, String whereName, String newWhereValue) {
+        try (PreparedStatement statement = mysqlconnection.prepareStatement("UPDATE " + tableName + " SET " + whereName + " = ? WHERE " + columnName + " = ?")) {
+            statement.setString(1, newWhereValue);
+            statement.setString(2, columnValue);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    //创建列
+    public void createColumn(String tableName, String columnName, String columnType) {
+        try (Statement statement = mysqlconnection.createStatement()) {
+            // 检查列是否存在
+            String checkQuery = "DESCRIBE " + tableName + " " + columnName;
+            ResultSet resultSet = statement.executeQuery(checkQuery);
+
+            // 如果结果集为空，则列不存在，执行ALTER TABLE语句添加新列
+            if (!resultSet.next()) {
+                String alterQuery = "ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " " + columnType;
+                statement.executeUpdate(alterQuery);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
 
 
     //将数组转换为String

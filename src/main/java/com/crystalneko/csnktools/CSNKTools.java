@@ -1,17 +1,22 @@
-package com.crystalneko.csnktools.csnktools;
+package com.crystalneko.csnktools;
 
 
-import com.crystalneko.csnktools.csnktools.CTTool.*;
-import com.crystalneko.csnktools.csnktools.CTcommand.csnktools;
-import com.crystalneko.csnktools.csnktools.CTcommand.csnktoolsTabCompleter;
+import com.crystalneko.csnktools.CTTool.*;
+import com.crystalneko.csnktools.CTcommand.csnktools;
+import com.crystalneko.csnktools.CTcommand.csnktoolsTabCompleter;
+import com.crystalneko.csnktools.CTcommand.csnktoolsadmin;
 
-import com.crystalneko.csnktools.csnktools.CTcommand.csnktoolsadmin;
-import com.crystalneko.csnktools.csnktools.website.LoginServlet;
+import com.crystalneko.csnktools.CTcommand.download;
+import com.crystalneko.csnktools.sql.PlayerJoinListener;
+import com.crystalneko.csnktools.website.LoginServlet;
+import com.crystalneko.csnktools.website.UserServlet;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.InvalidDescriptionException;
+import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,24 +30,23 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.SQLException;
 
 public final class CSNKTools extends JavaPlugin implements Listener {
 
 
-    private String pluginVersion;
     private File configFile;
     private FileConfiguration config;
     private loginmsg loginMsgListener;
     private CTScoreboard CTScoreboardListener;
-    private Music musicListener;
     private FileConfiguration languageConfig;
     private String language;
     private mysqlandemail mysqlAndemail;
     private mysqlandemail2 mysqlAndemail2;
     private serverendisable serverendisaBle;
-    private LoginServlet loginServlet;
-
-
+    private HtmlPlaceholderConverter htmlPlaceholderConverter;
+    private sqlite sqLite;
+    private PlayerJoinListener playerJoinListener;
 
 
 
@@ -51,23 +55,38 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         int pluginId = 19702; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, pluginId);
 
+        // 判断插件是否启用
+        if(isPluginLoaded("ctLib")) {
+            //下载ctLib前置插件
+            try {
+                download.downloadFile("https://w.csk.asia/res/ctLib.jar","plugins/ctLib.jar");
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+
+            // 获取插件管理器
+            PluginManager pluginManager = Bukkit.getPluginManager();
+            // 加载插件
+            try {
+                Plugin ctLib = pluginManager.loadPlugin(new File("plugins/ctLib.jar"));
+                // 启用插件
+                pluginManager.enablePlugin(ctLib);
+            } catch (InvalidPluginException e) {
+                System.out.println(e);
+            } catch (InvalidDescriptionException e) {
+                System.out.println(e);
+            }
+        }
 
 
         //复制资源文件
         copyresourceFiles();
-
         //加载配置
         createConfigFile();
-
         // 创建语言文件
         createLanguageFiles();
-
-
         // 加载语言文件
         loadLanguageFile();
-
-
-
         //加载消息
         String enableplugin = getMessage("Console.enable");
         Bukkit.getConsoleSender().sendMessage(enableplugin);
@@ -86,13 +105,33 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         }
         //检查NBAPI是否启用
         Boolean nbapienable = (isPluginLoaded("NoteBlockAPI"));
-        if(nbapienable) {}else{
+        if(nbapienable) {}else {
             String NONBAPI = getMessage("Error.NONBAPI");
             Bukkit.getConsoleSender().sendMessage(NONBAPI);
         }
+//------------------------------------------------------------------------初始化---------------------------------------------------------------------
+
+        //初始化mysql
+        mysqlAndemail2 = new mysqlandemail2(this);
+        //初始化占位符转换器
+        htmlPlaceholderConverter = new HtmlPlaceholderConverter(this);
+        //初始化email
+        mysqlAndemail = new mysqlandemail(this,htmlPlaceholderConverter);
+        //初始化sqlite
+        sqLite = new sqlite(this);
+        //初始化监听器PlayerJoinListen(com.crystalenko.csnktools.sql.PlayerJoinListener)
+        playerJoinListener = new PlayerJoinListener(sqLite,this);
+
+
+//------------------------------------------------------------------------监听器---------------------------------------------------------------------
+
+        // 注册监听器PlayerJoinListen(com.crystalenko.csnktools.sql.PlayerJoinListener)
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(sqLite,this), this);
+
+//------------------------------------------------------------------------加载配置---------------------------------------------------------------------
 
         // 注册命令执行器
-        getCommand("csnktools").setExecutor(new csnktools(this,nbapienable));
+        getCommand("csnktools").setExecutor(new csnktools(this,nbapienable,mysqlAndemail,htmlPlaceholderConverter));
         getCommand("csnktoolsadmin").setExecutor(new csnktoolsadmin(this));
         // 注册 Tab 补全
         getCommand("csnktools").setTabCompleter(new csnktoolsTabCompleter());
@@ -102,59 +141,76 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         String loadingplugin = getMessage("Console.loading");
         Bukkit.getConsoleSender().sendMessage(loadingplugin);
 
-        //初始化mysql
-        mysqlAndemail2 = new mysqlandemail2(this);
+
 
         //加载mysql
         if(getConfig().getBoolean("mysql.Enable")){
             mysqlAndemail2.loadConfig();
         }
+
         //加载email
         if (getConfig().getBoolean("smtp.Enable")){
-            mysqlAndemail = new mysqlandemail(this);
             mysqlAndemail.loadConfig();
             //加载启动邮件提示
             if(getConfig().getBoolean("serverendisable.enable")){
-                serverendisaBle = new serverendisable(mysqlAndemail,this,mysqlAndemail2);
+                serverendisaBle = new serverendisable(mysqlAndemail,this,mysqlAndemail2,sqLite);
                 serverendisaBle.serverenable();
             }
         }
 
 
-        //加载网页管理面板
+        //加载网页
         if (getConfig().getBoolean("website.Enable")){
+            String table_name = getConfig().getString("website.user_table");
+            //创建必要的表和列
+            mysqlAndemail2.createColumn(table_name,"username","VARCHAR(255)");
+            mysqlAndemail2.createColumn(table_name,"password","VARCHAR(255)");
+            mysqlAndemail2.createColumn(table_name,"ip","VARCHAR(255)");
+            mysqlAndemail2.createColumn(table_name,"regip","VARCHAR(255)");
+            mysqlAndemail2.createColumn(table_name,"email","VARCHAR(255)");
+            mysqlAndemail2.createColumn(table_name,"permission","VARCHAR(255)");
+            mysqlAndemail2.createColumn(table_name,"logged","VARCHAR(255)");
+            mysqlAndemail2.create_table(table_name,"username VARCHAR(255),password VARCHAR(255),ip VARCHAR(255),regip VARCHAR(255),email VARCHAR(255),permission VARCHAR(255),logged VARCHAR(255)");
             LoginServlet loginServlet = new LoginServlet(this, mysqlAndemail, mysqlAndemail2);
+            UserServlet userServlet = new UserServlet(htmlPlaceholderConverter,mysqlAndemail2,this,sqLite);
             Thread jettyThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         // 创建嵌入式Web服务器
                         try {
-// 获取服务器的端口号
+                           // 获取服务器的端口号
                             int port = getConfig().getInt("website.port");
 
-// 实例化Jetty服务器
+                            // 实例化Jetty服务器
                             Server server = new Server(port);
 
-/// 创建ServletContextHandler，并设置上下文路径
-                            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-                            context.setContextPath("/");
-                            context.addServlet(new ServletHolder(loginServlet), "/login/*");
+// 创建ServletContextHandler templateservlet，并设置上下文路径
+                            ServletContextHandler userservlet = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                            userservlet.setContextPath("/user");
+                            userservlet.addServlet(new ServletHolder(userServlet), "/*");
 
-// 配置静态资源处理器
+// 创建ServletContextHandler loginservlet，并设置上下文路径
+                            ServletContextHandler loginservlet = new ServletContextHandler(ServletContextHandler.SESSIONS);
+                            loginservlet.setContextPath("/login");
+                            loginservlet.addServlet(new ServletHolder(loginServlet), "/*");
+
+
+
+                            // 配置静态资源处理器
                             ResourceHandler resourceHandler = new ResourceHandler();
                             String resourceBase = System.getProperty("user.dir") + "/plugins/CSNKTools/website/";
                             resourceHandler.setResourceBase(resourceBase);
-// 可显示目录结构
-                            resourceHandler.setDirectoriesListed(true);
+                            // 可显示目录结构
+                            resourceHandler.setDirectoriesListed(getConfig().getBoolean("website.dirlist"));
 
-// 创建处理器集合
+                            // 创建处理器集合
                             HandlerCollection handlers = new HandlerCollection();
-                            handlers.setHandlers(new Handler[]{resourceHandler, context});
+                            handlers.setHandlers(new Handler[]{resourceHandler, loginservlet,userservlet});
 
                             server.setHandler(handlers);
 
-// 启动服务器
+                            // 启动服务器
                             server.start();
                             server.join();
 
@@ -353,10 +409,11 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         // 保存资源文件到目标文件夹
         checkAndSaveResource("email/serverdisable.html");
         checkAndSaveResource("email/serverenable.html");
+        checkAndSaveResource("email/feedback.html");
         checkAndSaveResource("website/index.html");
         checkAndSaveResource("website/login.html");
         checkAndSaveResource("website/register.html");
-        checkAndSaveResource("website/user.html");
+        checkAndSaveResource("website/user/user.html");
         saveResource("language/zh-cn.yml", true);
         saveResource("language/en-eu.yml", true);
     }

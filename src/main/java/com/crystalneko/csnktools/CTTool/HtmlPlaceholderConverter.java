@@ -1,17 +1,15 @@
-package com.crystalneko.csnktools.csnktools.CTTool;
+package com.crystalneko.csnktools.CTTool;
 
-import com.crystalneko.csnktools.csnktools.CSNKTools;
-import org.bukkit.Bukkit;
+import com.crystalneko.csnktools.CSNKTools;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Random;
 
 public class HtmlPlaceholderConverter {
     public String convertedHtml;
-    private mysqlandemail plugin;
-    public HtmlPlaceholderConverter(mysqlandemail plugin) {
+    private CSNKTools plugin;
+    public HtmlPlaceholderConverter(CSNKTools plugin) {
         this.plugin = plugin;
     }
 

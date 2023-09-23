@@ -1,6 +1,6 @@
-package com.crystalneko.csnktools.csnktools.CTTool;
+package com.crystalneko.csnktools.CTTool;
 
-import com.crystalneko.csnktools.csnktools.CSNKTools;
+import com.crystalneko.csnktools.CSNKTools;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.util.Properties;
@@ -15,15 +15,14 @@ public class mysqlandemail {
     private CSNKTools plugin;
     private HtmlPlaceholderConverter htmlPlaceholderConverter;
     private String body;
-    public mysqlandemail(CSNKTools plugin) {
+    public mysqlandemail(CSNKTools plugin,HtmlPlaceholderConverter htmlPlaceholderConverter) {
         this.plugin = plugin;
-
+        this.htmlPlaceholderConverter = htmlPlaceholderConverter;
     }
 
     public void loadConfig() {
 
         if (plugin.getConfig().getBoolean("smtp.Enable")) {
-            htmlPlaceholderConverter = new HtmlPlaceholderConverter(this);
 
             // 解析SMTP配置
             smtpHost = plugin.getConfig().getString("smtp.host");
@@ -34,7 +33,7 @@ public class mysqlandemail {
             smtpstarttls = plugin.getConfig().getBoolean("smtp.starttls");
 
             //这里是需要传入的所有参数
-            /*String emailto= "minecrafthetun@outlook.com";
+            /*String emailto= "minecraft@outlook.com";
             String subject = "测试邮件";
             String[] placeholder = {"<authcode />","<playername />"};
             int authcode = 114514;

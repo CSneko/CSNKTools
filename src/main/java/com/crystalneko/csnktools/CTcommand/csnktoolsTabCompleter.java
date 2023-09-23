@@ -1,4 +1,4 @@
-package com.crystalneko.csnktools.csnktools.CTcommand;
+package com.crystalneko.csnktools.CTcommand;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
