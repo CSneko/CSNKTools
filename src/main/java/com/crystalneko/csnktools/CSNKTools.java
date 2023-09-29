@@ -30,8 +30,6 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.SQLException;
-
 public final class CSNKTools extends JavaPlugin implements Listener {
 
 
@@ -54,9 +52,9 @@ public final class CSNKTools extends JavaPlugin implements Listener {
     public void onEnable() {
         int pluginId = 19702; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, pluginId);
-
         // 判断插件是否启用
-        if(isPluginLoaded("ctLib")) {
+        if(!isPluginLoaded("ctLib")) {
+
             //下载ctLib前置插件
             try {
                 download.downloadFile("https://w.csk.asia/res/ctLib.jar","plugins/ctLib.jar");
@@ -414,6 +412,7 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         checkAndSaveResource("website/login.html");
         checkAndSaveResource("website/register.html");
         checkAndSaveResource("website/user/user.html");
+        checkAndSaveResource("data/data.db");
         saveResource("language/zh-cn.yml", true);
         saveResource("language/en-eu.yml", true);
     }
