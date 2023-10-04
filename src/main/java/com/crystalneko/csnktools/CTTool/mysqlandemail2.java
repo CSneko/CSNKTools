@@ -33,10 +33,9 @@ public class mysqlandemail2 {
         mysqltime = plugin.getConfig().getString("mysql.time");
         mysqlchar = plugin.getConfig().getString("mysql.char");
         mysqlusessl = plugin.getConfig().getBoolean("mysql.usessl");
-        String sqlitepath = plugin.getConfig().getString("sqlite.path");
 
         try {
-            mysqlconnection = createConnection(sqlitepath);
+            mysqlconnection = createConnection();
         } catch (SQLException e) {
             Bukkit.getConsoleSender().sendMessage(plugin.getMessage("Error.cantmysql"));
         }
@@ -46,7 +45,7 @@ public class mysqlandemail2 {
 
 
     //mysql连接方法
-    public Connection createConnection(String sqlitepath) throws SQLException {
+    public Connection createConnection() throws SQLException {
             try {
                 Class.forName(plugin.getConfig().getString("mysql.drive"));
                 Bukkit.getConsoleSender().sendMessage(plugin.getMessage("Plugins.mysql.mysqldriveloaded"));

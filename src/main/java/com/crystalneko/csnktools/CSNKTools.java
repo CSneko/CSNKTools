@@ -15,8 +15,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.InvalidDescriptionException;
-import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -52,31 +50,8 @@ public final class CSNKTools extends JavaPlugin implements Listener {
     public void onEnable() {
         int pluginId = 19702; // <-- Replace with the id of your plugin!
         Metrics metrics = new Metrics(this, pluginId);
-        // 判断插件是否启用
-        if(!isPluginLoaded("ctLib")) {
-
-            //下载ctLib前置插件
-            try {
-                download.downloadFile("https://w.csk.asia/res/ctLib.jar","plugins/ctLib.jar");
-            } catch (IOException e) {
-                System.out.println(e);
-            }
-
-            // 获取插件管理器
-            PluginManager pluginManager = Bukkit.getPluginManager();
-            // 加载插件
-            try {
-                Plugin ctLib = pluginManager.loadPlugin(new File("plugins/ctLib.jar"));
-                // 启用插件
-                pluginManager.enablePlugin(ctLib);
-            } catch (InvalidPluginException e) {
-                System.out.println(e);
-            } catch (InvalidDescriptionException e) {
-                System.out.println(e);
-            }
-        }
-
-
+        // 判断ctLib插件是否启用
+        download.checkAndDownloadPlugin("ctLib","https://w.csk.asia/plugins/ctLib.jar");
         //复制资源文件
         copyresourceFiles();
         //加载配置
@@ -284,7 +259,7 @@ public final class CSNKTools extends JavaPlugin implements Listener {
 
 
     public void checkUpdates() {
-        String remoteUrl = "https://w.csk.asia/res/version.txt"; // 远程网站中存储版本号的文件地址
+        String remoteUrl = "https://w.csk.asia/res/version/CSNKTools.txt"; // 远程网站中存储版本号的文件地址
 
         try {
             URL url = new URL(remoteUrl);
@@ -324,7 +299,7 @@ public final class CSNKTools extends JavaPlugin implements Listener {
     }
 
     public void checkUpdates2(Player player) {
-        String remoteUrl = "https://w.csk.asia/res/version.txt"; // 远程网站中存储版本号的文件地址
+        String remoteUrl = "https://w.csk.asia/res/version/CSNKTools.txt"; // 远程网站中存储版本号的文件地址
 
         try {
             URL url = new URL(remoteUrl);
@@ -393,8 +368,9 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         Plugin targetPlugin = pluginManager.getPlugin(pluginName);
         if (targetPlugin != null && targetPlugin.isEnabled()) {
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
     //复制资源文件
     private void copyresourceFiles() {

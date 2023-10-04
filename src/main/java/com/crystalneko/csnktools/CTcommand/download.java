@@ -86,4 +86,39 @@ public class download {
             }
         }
     }
+    //检查和下载插件
+    public static void checkAndDownloadPlugin(String pluginName, String pluginUrl) {
+        PluginManager pluginManager = Bukkit.getPluginManager();
+        Plugin plugin = pluginManager.getPlugin(pluginName);
+
+        if (plugin == null) {
+            Bukkit.getLogger().info(pluginName+"插件未启动，开始下载并启动插件...");
+
+            try {
+                downloadPlugin(pluginUrl, pluginName);
+                pluginManager.loadPlugin(new File("plugins/" + pluginName + ".jar"));
+                pluginManager.enablePlugin(pluginManager.getPlugin(pluginName));
+                Bukkit.getLogger().info("插件下载并启动成功！");
+            } catch (Exception e) {
+                Bukkit.getLogger().severe("插件下载或启动失败：" + e.getMessage());
+            }
+        } else {
+            Bukkit.getLogger().info(pluginName+"插件已启动！");
+        }
+    }
+
+    private static void downloadPlugin(String pluginUrl, String pluginName) throws IOException {
+        URL url = new URL(pluginUrl);
+        BufferedInputStream in = new BufferedInputStream(url.openStream());
+        FileOutputStream fileOutputStream = new FileOutputStream("plugins/" + pluginName + ".jar");
+
+        byte[] dataBuffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+            fileOutputStream.write(dataBuffer, 0, bytesRead);
+        }
+
+        in.close();
+        fileOutputStream.close();
+    }
 }

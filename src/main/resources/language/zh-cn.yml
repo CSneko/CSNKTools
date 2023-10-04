@@ -1,11 +1,11 @@
 Console:
-  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V0.1.1 作者:CrystalNeko\n____________________________________\n国庆&中秋快乐"
+  enable: "____________________________________\n|\n|  //----------| |-------------|\n|  ||----------| |-------------|\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||\t\t       ||\n|  ||----------|      ||\n|  \\\\----------|      --\n|\n|CSNKTools V01.2 作者:CrystalNeko\n____________________________________\n国庆&中秋快乐"
   loading: "[CT]插件为启用状态，正在加载配置"
   disable: "[CT]插件为禁用状态"
 Command:
   ct_OPCDC: "只有玩家可以执行这条命令"
   ct_help: "§a使用方法:\n§b/csnktools help §3获取帮助\n§b/csnktools about §3关于\n§b/csnktools check §3检查更新\n§b/csnktools playsound <曲名> §3播放音乐\n§b/csnktools soundurl <链接> §3从链接获取音乐\n§b/csnktools feedback <标题> <内容> §3发送反馈"
-  ct_about: "§6版本:§aV0.1.1§e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools"
+  ct_about: "§6版本:§aV01.2§e作者:§6CrystalNeko §a项目地址:§bhttps://github.com/CSneko/CSNKTools"
   ct_unfeedback: "保存反馈数据时发生错误"
   ct_feedback: "你的反馈已成功提交"
   ct_nopermissions: "[CT]你没有使用该命令的权限!"
