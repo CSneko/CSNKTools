@@ -1,8 +1,13 @@
 package com.crystalneko.csnktools.CTTool;
 
 import com.crystalneko.csnktools.CSNKTools;
-import javax.mail.*;
-import javax.mail.internet.*;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 public class mysqlandemail {

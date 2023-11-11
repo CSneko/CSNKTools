@@ -12,11 +12,7 @@
 - 玩家向服务器发送反馈
 - 服务器启动或关闭时进行邮件提醒
 
-### 未来计划:
-- 添加Bossbar
-- 添加礼包功能
-- 更多的功能
-
+该项目目前更新缓慢，后面基本不会有什么更新，这并不意味着它已经被放弃了，你可以发送issues来反馈问题
 ### 注意事项：
 - 音乐必须使用nbs格式!!! [如何转换为nbs格式?](nbs.md)
 
@@ -114,10 +110,8 @@ Scoreboard:
 Music:
   Enable: true
   distance: 4
-  #云端音乐请输入链接
+  #云端音乐请输入链接,本地音乐请放入music文件夹
   qunqing: "https://w.csk.asia/res/nbs/qunqing.nbs"
-  #本地音乐请放入music文件夹，链接请填写为www
-  badapple: "www"
 #反馈功能，使用/ct feedback <主题> <内容> 发送反馈
 feedback:
   Enable: true

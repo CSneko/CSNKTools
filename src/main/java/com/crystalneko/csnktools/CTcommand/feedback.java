@@ -1,8 +1,8 @@
 package com.crystalneko.csnktools.CTcommand;
 
-import com.crystalneko.csnktools.CTTool.mysqlandemail;
 import com.crystalneko.csnktools.CSNKTools;
 import com.crystalneko.csnktools.CTTool.HtmlPlaceholderConverter;
+import com.crystalneko.csnktools.CTTool.mysqlandemail;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;

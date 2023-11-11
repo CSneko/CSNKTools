@@ -1,17 +1,15 @@
 package com.crystalneko.csnktools.CTcommand;
 
 
-
+import com.crystalneko.csnktools.CSNKTools;
 import com.crystalneko.csnktools.CTTool.HtmlPlaceholderConverter;
-import com.crystalneko.csnktools.CTTool.mysqlandemail;
 import com.crystalneko.csnktools.CTTool.Music;
-import org.bukkit.*;
+import com.crystalneko.csnktools.CTTool.mysqlandemail;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
 import org.bukkit.entity.Player;
-import com.crystalneko.csnktools.CSNKTools;
 
 
 public class csnktools implements CommandExecutor {

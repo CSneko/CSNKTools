@@ -5,10 +5,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class csnktoolsTabCompleter implements TabCompleter {
     //获取配置中某个键的子键(尽管目前还没用到)
@@ -34,6 +39,8 @@ public class csnktoolsTabCompleter implements TabCompleter {
                 completions.add("playsound");
                 completions.add("soundurl");
                 completions.add("feedback");
+            }if(args.length == 2 && args[1].equalsIgnoreCase("playsound")){//补全曲目
+                return getMusic();
             }
 
         }
@@ -47,5 +54,25 @@ public class csnktoolsTabCompleter implements TabCompleter {
 
 
         return completions;
+    }
+    public List<String> getMusic(){
+        String directoryPath = "plugins/CSNKTools/music";
+        List<String> fileNames = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.walk(Paths.get(directoryPath))) {
+            fileNames = paths
+                    .filter(Files::isRegularFile) // 是文件，不是文件夹
+                    .map(Path::toFile)
+                    .filter(file -> file.getName().endsWith(".nbs")) // 文件扩展名为.nbs
+                    .map(file -> {
+                        String fileNameWithExtension = file.getName();
+                        return fileNameWithExtension.substring(0, fileNameWithExtension.lastIndexOf(".")); // 去掉文件扩展名
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return fileNames;
     }
 }

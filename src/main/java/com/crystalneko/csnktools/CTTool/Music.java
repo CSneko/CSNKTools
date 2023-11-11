@@ -2,19 +2,22 @@ package com.crystalneko.csnktools.CTTool;
 
 import com.crystalneko.csnktools.CSNKTools;
 import com.crystalneko.csnktools.CTcommand.download;
-
 import com.xxmicloxx.NoteBlockAPI.model.Song;
 import com.xxmicloxx.NoteBlockAPI.songplayer.EntitySongPlayer;
 import com.xxmicloxx.NoteBlockAPI.utils.NBSDecoder;
-import org.bukkit.configuration.ConfigurationSection;
-
+import org.bukkit.entity.Player;
 
 import java.io.File;
-
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-
-import org.bukkit.entity.Player;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Music {
     private CSNKTools plugin;
@@ -23,11 +26,9 @@ public class Music {
     }
     public void getCommandValue(String songName, Player player){
 
-        // 获取配置文件的Music节点
-        ConfigurationSection musicSection = plugin.getConfig().getConfigurationSection("Music");
 
         // 检查曲名是否在配置中
-        if (musicSection.contains(songName)) {
+        if (isMusic(songName)) {
             String songURL = plugin.getConfig().getString("Music." + songName);
             //缓存变量
             String musictempfile = "plugins/CSNKTools/temp/" + songName + ".nbs";
@@ -68,6 +69,8 @@ public class Music {
                 e.printStackTrace();
             }
 
+        }else {
+            player.sendMessage("音乐不存在!");
         }
     }
     public Boolean playsound(String songName, Player player){
@@ -129,6 +132,29 @@ public class Music {
         // Start RadioSongPlayer playback
         esp.setPlaying(true);
         return true;
+    }
+    public Boolean isMusic(String songName){
+        String directoryPath = "plugins/CSNKTools/music";
+        List<String> fileNames = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.walk(Paths.get(directoryPath))) {
+            fileNames = paths
+                    .filter(Files::isRegularFile) // 是文件，不是文件夹
+                    .map(Path::toFile)
+                    .filter(file -> file.getName().endsWith(".nbs")) // 文件扩展名为.nbs
+                    .map(file -> {
+                        String fileNameWithExtension = file.getName();
+                        return fileNameWithExtension.substring(0, fileNameWithExtension.lastIndexOf(".")); // 去掉文件扩展名
+                    })
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // 将List转换为Array
+        String[] fileNamesArray = fileNames.toArray(new String[0]);
+        boolean exists = Arrays.stream(fileNamesArray).anyMatch(songName::equals);
+        return exists;
     }
 
 }

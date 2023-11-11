@@ -5,7 +5,6 @@ import com.crystalneko.csnktools.CTTool.*;
 import com.crystalneko.csnktools.CTcommand.csnktools;
 import com.crystalneko.csnktools.CTcommand.csnktoolsTabCompleter;
 import com.crystalneko.csnktools.CTcommand.csnktoolsadmin;
-
 import com.crystalneko.csnktools.CTcommand.download;
 import com.crystalneko.csnktools.sql.PlayerJoinListener;
 import com.crystalneko.csnktools.website.LoginServlet;
@@ -25,7 +24,10 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 public final class CSNKTools extends JavaPlugin implements Listener {
@@ -56,8 +58,6 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         copyresourceFiles();
         //加载配置
         createConfigFile();
-        // 创建语言文件
-        createLanguageFiles();
         // 加载语言文件
         loadLanguageFile();
         //加载消息
@@ -65,6 +65,8 @@ public final class CSNKTools extends JavaPlugin implements Listener {
         Bukkit.getConsoleSender().sendMessage(enableplugin);
         //检查更新
         checkUpdates();
+        //创建必要的东西
+        createNecessary();
         // 加载类readconfig
         readconfig();
     }
@@ -222,21 +224,6 @@ public final class CSNKTools extends JavaPlugin implements Listener {
 
     }
 
-    private void createLanguageFiles() {
-        String[] languageFiles = {"zh-cn.yml" ,"en-eu.yml", "more.yml"};
-        File languageFolder = new File(getDataFolder(), "language");
-
-        if (!languageFolder.exists()) {
-            languageFolder.mkdirs();
-        }
-
-        for (String fileName : languageFiles) {
-            File languageFile = new File(languageFolder, fileName);
-            if (!languageFile.exists()) {
-                saveResource("language/" + fileName, false);
-            }
-        }
-    }
 
 
     private void loadLanguageFile() {
@@ -431,5 +418,18 @@ public final class CSNKTools extends JavaPlugin implements Listener {
             }
         }
         folder.delete();
+    }
+    public static void createNecessary(){
+        createPath("plugins/CSNKTools/music/");
+    }
+    public static void createPath(String path){
+        String directoryPath = path;
+        File directory = new File(directoryPath);
+
+        if (!directory.exists()) {
+            boolean isCreated = directory.mkdirs();
+        } else {
+            System.out.println("Directory already exists");
+        }
     }
 }

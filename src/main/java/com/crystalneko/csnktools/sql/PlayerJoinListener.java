@@ -1,11 +1,11 @@
 package com.crystalneko.csnktools.sql;
 
 import com.crystalneko.csnktools.CSNKTools;
+import com.crystalneko.csnktools.CTTool.sqlite;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import com.crystalneko.csnktools.CTTool.sqlite;
 
 public class PlayerJoinListener implements Listener {
 

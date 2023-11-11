@@ -2,7 +2,6 @@ package com.crystalneko.csnktools.CTTool;
 
 import com.crystalneko.csnktools.CSNKTools;
 import com.crystalneko.csnktools.CTcommand.download;
-
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
