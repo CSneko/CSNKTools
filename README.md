@@ -1,6 +1,7 @@
 [English user please check there](README_EN.md)
 # CSNKTools
 ### 一个多功能，可自定义，且开源免费的插件
+**注意**:该项目已停止更新，后续只会修复Bug
 ## 它能干什么?
 ### 目前版本中，它可以做到:
 - 当玩家加入游戏时，全服广播自定义消息，且支持PlaceholdAPI
